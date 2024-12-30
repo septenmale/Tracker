@@ -13,5 +13,4 @@ The **Tracker App** is designed to help users build and manage habits effectivel
 ## Technical Details
 - **Minimum iOS Version**: iOS 13.4
 - **Supported Devices**: iPhone X and later
-- **UI Font**: SF Pro
 - **Architecture**: MVVM

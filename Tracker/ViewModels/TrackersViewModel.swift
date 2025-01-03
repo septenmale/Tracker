@@ -33,7 +33,7 @@ final class TrackersViewModel {
     }
     // add new Tracker
     func addTracker() {
-        // TODO:
+        // TODO: adding logic
     }
     
 }

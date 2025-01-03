@@ -47,31 +47,32 @@ final class TrackersViewController: UIViewController {
         return stackView
     }()
     
-    private let dateLabel: UILabel = {
-        let label = UILabel()
-        label.backgroundColor = .lightGray
-        label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-        label.layer.cornerRadius = 8
-        label.layer.masksToBounds = true
-        label.text = DateFormatter.trackerVCDateFormatter.string(from: Date())
-        return label
-    }()
-    
-    private let plusButton: UIButton = {
+   lazy private var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "AddNewTrackerButton"), for: .normal)
-        button.frame = CGRect(x: 0, y: 0, width: 42, height: 42)
         button.addTarget(self, action: #selector(addTracker), for: .touchUpInside)
         return button
     }()
+    
+    lazy private var datePicker: UIDatePicker = {
+        let datePicker = UIDatePicker()
+        datePicker.preferredDatePickerStyle = .compact
+        datePicker.datePickerMode = .date
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+        return datePicker
+    }()
     // TODO: add button logic
     @objc private func addTracker() {
-        
+        print("Button tapped")
+    }
+    // TODO: add picked date logic
+    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
+       print("jopa")
     }
     
     private func addNavItems() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: plusButton)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: dateLabel)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         navigationItem.searchController = searchController
     }
     

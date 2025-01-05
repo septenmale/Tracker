@@ -10,7 +10,7 @@ import Foundation
 final class TrackersViewModel {
     
     private var completedTrackers: [TrackerRecord] = []
-    private var categories: [TrackerCategory] = []
+    var categories: [TrackerCategory] = []
     
     init() {
         
@@ -58,20 +58,23 @@ final class TrackersViewModel {
         // TODO: adding logic
     }
     
-    func getTrackers(for date: Date) -> [Tracker] {
-        var result: [Tracker] = []
+    func getTrackers(for date: Date) -> [TrackerCategory] {
+        var filteredCategories: [TrackerCategory] = []
         
         let weekdayIndex = Calendar.current.component(.weekday, from: date)
         let currentWeekday = weekdayFromIndex(weekdayIndex)
         
         for category in categories {
-            for tracker in category.items {
-                if tracker.schedule.contains(currentWeekday) {
-                    result.append(tracker)
-                }
+            let filteredItems = category.items.filter({ (tracker: Tracker) -> Bool in
+                return tracker.schedule.contains(currentWeekday)
+            })
+            
+            if !filteredItems.isEmpty {
+                filteredCategories.append(TrackerCategory(title: category.title, items: filteredItems))
             }
         }
-        return result
+        
+        return filteredCategories
     }
     
     private func weekdayFromIndex(_ index: Int) -> Weekday {

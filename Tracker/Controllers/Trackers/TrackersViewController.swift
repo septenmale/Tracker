@@ -15,15 +15,15 @@ final class TrackersViewController: UIViewController {
         title = "Trackers"
         
         addNavItems()
-        setupStackView()
+//        setupStackView()
         setUpCollectionView()
-        setupConstraints()
+//        setupConstraints()
         
         updateTrackers(for: Date())
     }
     
     private let viewModel = TrackersViewModel()
-    private var filteredTrackers: [Tracker] = []
+    private var filteredTrackers: [TrackerCategory] = []
     
     private let emojis = [ "🍇", "🍈", "🍉", "🍊", "🍋" ]
     
@@ -39,26 +39,26 @@ final class TrackersViewController: UIViewController {
         return searchController
     }()
     
-    private let stubLabel: UIImageView = {
-        let label = UIImageView()
-        label.image = UIImage(named: "StubIfNoTrackers")
-        return label
-    }()
+//    private let stubLabel: UIImageView = {
+//        let label = UIImageView()
+//        label.image = UIImage(named: "StubIfNoTrackers")
+//        return label
+//    }()
+//    
+//    private let stubLabelText: UILabel = {
+//        let label = UILabel()
+//        label.text = "Что будем отслеживать?"
+//        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+//        return label
+//    }()
     
-    private let stubLabelText: UILabel = {
-        let label = UILabel()
-        label.text = "Что будем отслеживать?"
-        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        return label
-    }()
-    
-    private let stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 8
-        stackView.alignment = .center
-        return stackView
-    }()
+//    private let stackView: UIStackView = {
+//        let stackView = UIStackView()
+//        stackView.axis = .vertical
+//        stackView.spacing = 8
+//        stackView.alignment = .center
+//        return stackView
+//    }()
     
    lazy private var plusButton: UIButton = {
         let button = UIButton()
@@ -95,22 +95,22 @@ final class TrackersViewController: UIViewController {
         navigationItem.searchController = searchController
     }
     
-    private func setupStackView() {
-        stackView.addArrangedSubview(stubLabel)
-        stackView.addArrangedSubview(stubLabelText)
-    }
+//    private func setupStackView() {
+//        stackView.addArrangedSubview(stubLabel)
+//        stackView.addArrangedSubview(stubLabelText)
+//    }
     
-    private func setupConstraints() {
-        view.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stubLabel.widthAnchor.constraint(equalToConstant: 80),
-            stubLabel.heightAnchor.constraint(equalToConstant: 80)
-        ])
-    }
+//    private func setupConstraints() {
+//        view.addSubview(stackView)
+//        stackView.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        NSLayoutConstraint.activate([
+//            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            stubLabel.widthAnchor.constraint(equalToConstant: 80),
+//            stubLabel.heightAnchor.constraint(equalToConstant: 80)
+//        ])
+//    }
     
     private func setUpCollectionView() {
         view.addSubview(collectionView)
@@ -125,6 +125,9 @@ final class TrackersViewController: UIViewController {
         
         collectionView.delegate = self
         collectionView.dataSource = self
+        
+        collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.reuseIdentifier)
+        collectionView.register(CollectionFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: CollectionFooter.reuseIdentifier)
         collectionView.register(TrackersCell.self, forCellWithReuseIdentifier: TrackersCell.reuseIdentifier)
     }
     
@@ -142,21 +145,69 @@ extension TrackersViewController: UICollectionViewDelegate {
 
 extension TrackersViewController: UICollectionViewDataSource {
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        //TODO: fix
         return filteredTrackers.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filteredTrackers[section].items.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersCell.reuseIdentifier, for: indexPath) as? TrackersCell
         guard let cell else { return UICollectionViewCell() }
-        
-        let tracker = filteredTrackers[indexPath.row]
+        //TODO: fix
+        let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
         cell.titleLabel.text = tracker.title
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                             withReuseIdentifier: CollectionHeader.reuseIdentifier,
+                                                                             for: indexPath
+            ) as! CollectionHeader
+            
+            headerView.titleLabel.textColor = .red
+            headerView.titleLabel.text = filteredTrackers[indexPath.section].title
+            return headerView
+            
+        case UICollectionView.elementKindSectionFooter:
+            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                             withReuseIdentifier: CollectionFooter.reuseIdentifier, for: indexPath
+            ) as! CollectionFooter
+            
+            footerView.titleLabel.textColor = .blue
+            footerView.titleLabel.text = "\(filteredTrackers[indexPath.section].items.count) трекеров"
+            return footerView
+            
+        default:
+            fatalError("Unexpected supplementary element kind \(kind)")
+        }
     }
     
 }
 
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 50)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForFooterInSection section: Int
+    ) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 50)
+    }
     
 }

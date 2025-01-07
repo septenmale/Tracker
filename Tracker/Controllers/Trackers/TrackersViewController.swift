@@ -127,7 +127,7 @@ final class TrackersViewController: UIViewController {
         collectionView.dataSource = self
         
         collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.reuseIdentifier)
-        collectionView.register(CollectionFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: CollectionFooter.reuseIdentifier)
+//        collectionView.register(CollectionFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: CollectionFooter.reuseIdentifier)
         collectionView.register(TrackersCell.self, forCellWithReuseIdentifier: TrackersCell.reuseIdentifier)
     }
     
@@ -159,7 +159,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let cell else { return UICollectionViewCell() }
         //TODO: fix
         let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
-        cell.titleLabel.text = tracker.title
+//        cell.titleLabel.text = tracker.title
         return cell
     }
     
@@ -172,18 +172,17 @@ extension TrackersViewController: UICollectionViewDataSource {
                                                                              for: indexPath
             ) as! CollectionHeader
             
-            headerView.titleLabel.textColor = .red
             headerView.titleLabel.text = filteredTrackers[indexPath.section].title
             return headerView
             
-        case UICollectionView.elementKindSectionFooter:
-            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                             withReuseIdentifier: CollectionFooter.reuseIdentifier, for: indexPath
-            ) as! CollectionFooter
-            
-            footerView.titleLabel.textColor = .blue
-            footerView.titleLabel.text = "\(filteredTrackers[indexPath.section].items.count) трекеров"
-            return footerView
+//        case UICollectionView.elementKindSectionFooter:
+//            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+//                                                                             withReuseIdentifier: CollectionFooter.reuseIdentifier, for: indexPath
+//            ) as! CollectionFooter
+//            
+//            footerView.titleLabel.textColor = .blue
+//            footerView.titleLabel.text = "\(filteredTrackers[indexPath.section].items.count) трекеров"
+//            return footerView
             
         default:
             fatalError("Unexpected supplementary element kind \(kind)")
@@ -199,15 +198,16 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 50)
+        return CGSize(width: collectionView.bounds.width, height: 18) //TODO: change geight
     }
     
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        referenceSizeForFooterInSection section: Int
-    ) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 50)
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+            // Размер ячейки — половина ширины экрана (2 ячейки в ряд)
+            return CGSize(width: collectionView.frame.width / 2, height: 148)
+        }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
     }
     
 }

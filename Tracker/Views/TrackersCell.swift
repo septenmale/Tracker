@@ -19,7 +19,7 @@ final class TrackersCell: UICollectionViewCell {
         return view
     }()
     
-    private let emodjiLabel: UILabel = {
+    let emodjiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.text = "😀"

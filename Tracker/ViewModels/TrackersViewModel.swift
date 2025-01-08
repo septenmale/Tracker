@@ -29,8 +29,16 @@ final class TrackersViewModel {
                 emoji: "📖",
                 schedule: [.tuesday, .thursday, .saturday]
             )
+        
+        let tracker3 = Tracker(
+            id: UUID(),
+            title: "Не делать зарядку",
+            color: "blue",
+            emoji: "💪",
+            schedule: [.monday, .wednesday, .friday]
+        )
             
-            let category = TrackerCategory(title: "Здоровье", items: [tracker1, tracker2])
+        let category = TrackerCategory(title: "Здоровье", items: [tracker1, tracker2, tracker3])
             categories = [category]
         }
     

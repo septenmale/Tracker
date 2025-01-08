@@ -7,6 +7,22 @@
 
 import UIKit
 
+struct GeometricParams {
+    let cellCount: Int
+    let leftInset: CGFloat
+    let rightInset: CGFloat
+    let cellSpacing: CGFloat
+    let paddingWidth: CGFloat
+    
+    init(cellCount: Int, leftInset: CGFloat, rightInset: CGFloat, cellSpacing: CGFloat) {
+        self.cellCount = cellCount
+        self.leftInset = leftInset
+        self.rightInset = rightInset
+        self.cellSpacing = cellSpacing
+        self.paddingWidth = leftInset + rightInset + CGFloat(cellCount - 1) * cellSpacing
+    }
+}
+
 final class TrackersViewController: UIViewController {
     
     override func viewDidLoad() {
@@ -25,6 +41,7 @@ final class TrackersViewController: UIViewController {
     private let viewModel = TrackersViewModel()
     private var filteredTrackers: [TrackerCategory] = []
     
+    private let params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     private let emojis = [ "🍇", "🍈", "🍉", "🍊", "🍋" ]
     
     private let collectionView = UICollectionView(
@@ -146,7 +163,6 @@ extension TrackersViewController: UICollectionViewDelegate {
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        //TODO: fix
         return filteredTrackers.count
     }
     
@@ -157,12 +173,14 @@ extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersCell.reuseIdentifier, for: indexPath) as? TrackersCell
         guard let cell else { return UICollectionViewCell() }
-        //TODO: fix
+        
         let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
-//        cell.titleLabel.text = tracker.title
+        cell.titleLabel.text = tracker.title
+        cell.emodjiLabel.text = tracker.emoji
+        //TODO: cell.daysAmountLabel.text =
         return cell
     }
-    
+    //TODO: Refractor
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         switch kind {
@@ -174,15 +192,6 @@ extension TrackersViewController: UICollectionViewDataSource {
             
             headerView.titleLabel.text = filteredTrackers[indexPath.section].title
             return headerView
-            
-//        case UICollectionView.elementKindSectionFooter:
-//            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-//                                                                             withReuseIdentifier: CollectionFooter.reuseIdentifier, for: indexPath
-//            ) as! CollectionFooter
-//            
-//            footerView.titleLabel.textColor = .blue
-//            footerView.titleLabel.text = "\(filteredTrackers[indexPath.section].items.count) трекеров"
-//            return footerView
             
         default:
             fatalError("Unexpected supplementary element kind \(kind)")
@@ -198,16 +207,22 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         referenceSizeForHeaderInSection section: Int
     ) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: 18) //TODO: change geight
+        return CGSize(width: collectionView.bounds.width, height: 18)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            // Размер ячейки — половина ширины экрана (2 ячейки в ряд)
-            return CGSize(width: collectionView.frame.width / 2, height: 148)
+        
+        let availableWidth = collectionView.frame.width - params.paddingWidth
+        let cellWidth =  availableWidth / CGFloat(params.cellCount)
+        return CGSize(width: cellWidth, height: 148)
         }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 10, left: params.leftInset, bottom: 10, right: params.rightInset)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        return params.cellSpacing
     }
     
 }

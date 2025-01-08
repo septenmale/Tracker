@@ -13,7 +13,7 @@ final class TrackersCell: UICollectionViewCell {
     
     private let trackerContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(named: "Color selection 5") // Зелёный цвет
+        view.backgroundColor = UIColor(named: "Color selection 5")
         view.layer.cornerRadius = 16
         view.layer.masksToBounds = true
         return view
@@ -50,19 +50,15 @@ final class TrackersCell: UICollectionViewCell {
     
     let addAsCompleteButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(named: "Color selection 5")
-        button.setImage(UIImage(named: "plusButton"), for: .normal)
-        button.layer.cornerRadius = 16
+        button.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        button.tintColor = UIColor(named: "Color selection 5")
+        button.layer.cornerRadius = 17
         button.layer.masksToBounds = true
         return button
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        contentView.backgroundColor = UIColor(named: "Color selection 5")
-        contentView.layer.cornerRadius = 16
-        contentView.layer.masksToBounds = true
         
         setupContainerView()
         setupStackView()
@@ -75,6 +71,7 @@ final class TrackersCell: UICollectionViewCell {
     }
     
     private func setupStackView() {
+        contentView.addSubview(stackView)
         stackView.addArrangedSubview(daysAmountLabel)
         stackView.addArrangedSubview(addAsCompleteButton)
     }
@@ -86,32 +83,33 @@ final class TrackersCell: UICollectionViewCell {
     }
     
     private func setupConstraints() {
-        addSubview(titleLabel)
-        addSubview(stackView)
-        addSubview(trackerContainerView)
         
+        emodjiLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
         trackerContainerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            // Зелёный квадрат
+            
             trackerContainerView.topAnchor.constraint(equalTo: contentView.topAnchor),
             trackerContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackerContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-//            trackerContainerView.heightAnchor.constraint(equalToConstant: 90),
+            trackerContainerView.heightAnchor.constraint(equalToConstant: 90),
             
-            // Эмодзи
             emodjiLabel.topAnchor.constraint(equalTo: trackerContainerView.topAnchor, constant: 12),
             emodjiLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
             emodjiLabel.heightAnchor.constraint(equalToConstant: 24),
             emodjiLabel.widthAnchor.constraint(equalToConstant: 24),
-            // Текст
+            
             titleLabel.topAnchor.constraint(equalTo: emodjiLabel.bottomAnchor, constant: 8),
+            titleLabel.bottomAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: -12),
             titleLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor, constant: -12),
-            // Горизонтальный стек
-            stackView.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor),
+            
+            addAsCompleteButton.widthAnchor.constraint(equalToConstant: 34),
+            addAsCompleteButton.heightAnchor.constraint(equalToConstant: 34),
+            
+            stackView.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: 8),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),

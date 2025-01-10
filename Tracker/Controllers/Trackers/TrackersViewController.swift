@@ -15,11 +15,12 @@ final class TrackersViewController: UIViewController {
         title = "Trackers"
         
         addNavItems()
-//        setupStackView()
+        setupStackView()
         setUpCollectionView()
-//        setupConstraints()
+        setupConstraints()
         
         updateTrackers(for: Date())
+        setupUIBasedOnData()
     }
     
     private let viewModel = TrackersViewModel()
@@ -39,26 +40,26 @@ final class TrackersViewController: UIViewController {
         return searchController
     }()
     
-//    private let stubLabel: UIImageView = {
-//        let label = UIImageView()
-//        label.image = UIImage(named: "StubIfNoTrackers")
-//        return label
-//    }()
-//    
-//    private let stubLabelText: UILabel = {
-//        let label = UILabel()
-//        label.text = "Что будем отслеживать?"
-//        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-//        return label
-//    }()
+    private let stubLabel: UIImageView = {
+        let label = UIImageView()
+        label.image = UIImage(named: "StubIfNoTrackers")
+        return label
+    }()
     
-//    private let stackView: UIStackView = {
-//        let stackView = UIStackView()
-//        stackView.axis = .vertical
-//        stackView.spacing = 8
-//        stackView.alignment = .center
-//        return stackView
-//    }()
+    private let stubLabelText: UILabel = {
+        let label = UILabel()
+        label.text = "Что будем отслеживать?"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        return label
+    }()
+    
+    private let stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        stackView.alignment = .center
+        return stackView
+    }()
     
    lazy private var plusButton: UIButton = {
         let button = UIButton()
@@ -82,6 +83,7 @@ final class TrackersViewController: UIViewController {
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
         let selectedDate = Calendar.current.startOfDay(for: sender.date)
         updateTrackers(for: selectedDate)
+        setupUIBasedOnData()
     }
     
     private func updateTrackers(for date: Date) {
@@ -95,22 +97,32 @@ final class TrackersViewController: UIViewController {
         navigationItem.searchController = searchController
     }
     
-//    private func setupStackView() {
-//        stackView.addArrangedSubview(stubLabel)
-//        stackView.addArrangedSubview(stubLabelText)
-//    }
+    private func setupStackView() {
+        stackView.addArrangedSubview(stubLabel)
+        stackView.addArrangedSubview(stubLabelText)
+    }
     
-//    private func setupConstraints() {
-//        view.addSubview(stackView)
-//        stackView.translatesAutoresizingMaskIntoConstraints = false
-//        
-//        NSLayoutConstraint.activate([
-//            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            stubLabel.widthAnchor.constraint(equalToConstant: 80),
-//            stubLabel.heightAnchor.constraint(equalToConstant: 80)
-//        ])
-//    }
+    private func setupConstraints() {
+        view.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stubLabel.widthAnchor.constraint(equalToConstant: 80),
+            stubLabel.heightAnchor.constraint(equalToConstant: 80)
+        ])
+    }
+    
+    private func setupUIBasedOnData() {
+        filteredTrackers.isEmpty ? updateScreen(showCollectionView: false) : updateScreen(showCollectionView: true)
+    }
+    
+    private func updateScreen(showCollectionView: Bool) {
+        collectionView.isHidden = !showCollectionView
+        stackView.isHidden = showCollectionView
+        
+    }
     
     private func setUpCollectionView() {
         view.addSubview(collectionView)
@@ -158,6 +170,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
         let selectedDate = datePicker.date
+        let currentDate = Calendar.current.startOfDay(for: Date())
         
         let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
         let daysCount = viewModel.getDaysAmount(tracker)
@@ -171,6 +184,7 @@ extension TrackersViewController: UICollectionViewDataSource {
 
             let selectedDate = self.datePicker.date
             
+            guard selectedDate <= currentDate else { return }
             if self.viewModel.isTrackerCompleted(tracker, on: selectedDate) {
                     self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
                 } else {

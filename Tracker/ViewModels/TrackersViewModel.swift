@@ -48,13 +48,11 @@ final class TrackersViewModel {
         let newRecord = TrackerRecord(id: tracker.id, date: startOfDay)
         // adding to array immutable
         completedTrackers = completedTrackers + [newRecord]
-        print("Tracker completed: \(tracker.title) on \(date)")
     }
     
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
         completedTrackers.removeAll { $0.id == tracker.id && $0.date == startOfDay }
-        print("Tracker in progress: \(tracker.title) on \(date)")
     }
     
     func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {

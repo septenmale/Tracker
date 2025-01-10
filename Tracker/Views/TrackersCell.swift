@@ -74,19 +74,16 @@ final class TrackersCell: UICollectionViewCell {
     }
     
     @objc private func changeTrackerState() {
-        
-//        let isCompleted = addAsCompleteButton.image(for: .normal) == UIImage(systemName: "plus.circle.fill")
-//        
-//        addAsCompleteButton.setImage(UIImage(systemName: isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"),
-//                                     for: .normal)
         guard let trackerId else { return }
         changeStateClosure?(trackerId)
     }
     
-    func updateUI(isCompleted: Bool, daysCount: Int) {
+    func updateUI(isCompleted: Bool, daysCount: Int, tracker: Tracker) {
         let buttonImage = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
         addAsCompleteButton.setImage(UIImage(systemName: buttonImage), for: .normal)
         daysAmountLabel.text = "\(daysCount) \(daysCount == 1 ? "день" : "дней")"
+        emodjiLabel.text = tracker.emoji
+        titleLabel.text = tracker.title
     }
     
     private func setupStackView() {

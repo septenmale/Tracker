@@ -14,21 +14,21 @@ final class TrackersViewModel {
     
     init() {
         
-            let tracker1 = Tracker(
-                id: UUID(),
-                title: "Сделать зарядку",
-                color: "blue",
-                emoji: "💪",
-                schedule: [.monday, .wednesday, .friday]
-            )
-            
-            let tracker2 = Tracker(
-                id: UUID(),
-                title: "Читать книгу",
-                color: "green",
-                emoji: "📖",
-                schedule: [.tuesday, .thursday, .saturday]
-            )
+        let tracker1 = Tracker(
+            id: UUID(),
+            title: "Сделать зарядку",
+            color: "blue",
+            emoji: "💪",
+            schedule: [.monday, .wednesday, .friday]
+        )
+        
+        let tracker2 = Tracker(
+            id: UUID(),
+            title: "Читать книгу",
+            color: "green",
+            emoji: "📖",
+            schedule: [.tuesday, .thursday, .saturday]
+        )
         
         let tracker3 = Tracker(
             id: UUID(),
@@ -37,29 +37,29 @@ final class TrackersViewModel {
             emoji: "💪",
             schedule: [.monday, .wednesday, .friday]
         )
-            
+        
         let category = TrackerCategory(title: "Здоровье", items: [tracker1, tracker2, tracker3])
-            categories = [category]
-        }
+        categories = [category]
+    }
     
     func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
+        let startOfDay = Calendar.current.startOfDay(for: date)
         // create new record
-        let newRecord = TrackerRecord(id: tracker.id, date: date)
+        let newRecord = TrackerRecord(id: tracker.id, date: startOfDay)
         // adding to array immutable
         completedTrackers = completedTrackers + [newRecord]
+        print("Tracker completed: \(tracker.title) on \(date)")
     }
     
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
-        // creating new array without current record
-        completedTrackers = completedTrackers.filter {
-            !($0.id == tracker.id && $0.date == date)
-        }
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        completedTrackers.removeAll { $0.id == tracker.id && $0.date == startOfDay }
+        print("Tracker in progress: \(tracker.title) on \(date)")
     }
     
     func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {
-        return completedTrackers.contains(where: {
-            $0.id == tracker.id && $0.date == date
-        })
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        return completedTrackers.contains(where: { $0.id == tracker.id && $0.date == startOfDay })
     }
     
     func getDaysAmount(_ tracker: Tracker) -> Int {

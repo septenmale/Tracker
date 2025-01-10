@@ -26,7 +26,6 @@ final class TrackersViewController: UIViewController {
     private var filteredTrackers: [TrackerCategory] = []
     
     private let params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
-    private let emojis = [ "🍇", "🍈", "🍉", "🍊", "🍋" ]
     
     private let collectionView = UICollectionView(
         frame: .zero,
@@ -81,7 +80,7 @@ final class TrackersViewController: UIViewController {
     }
     // TODO: add picked date logic
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
-       let selectedDate = sender.date
+        let selectedDate = Calendar.current.startOfDay(for: sender.date)
         updateTrackers(for: selectedDate)
     }
     
@@ -159,32 +158,28 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
         let selectedDate = datePicker.date
-//        let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
+        
+        let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
         let daysCount = viewModel.getDaysAmount(tracker)
         
         cell.trackerId = tracker.id
-//        cell.updateUI(isCompleted: isCompleted, daysCount: daysCount)
+        cell.updateUI(isCompleted: isCompleted, daysCount: daysCount, tracker: tracker)
         
         cell.changeStateClosure = { [weak self] trackerId in
             guard let self else { return }
-            
             guard let tracker = self.viewModel.getTracker(by: trackerId) else { return }
-            //TODO: тут переделать isCompleted может быть старым
-//            if isCompleted {
-//                self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
-//            } else {
-//                self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
-//            }
+
+            let selectedDate = self.datePicker.date
+            
             if self.viewModel.isTrackerCompleted(tracker, on: selectedDate) {
                     self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
                 } else {
                     self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
                 }
             
-            
+            let updatedIsCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
             let updatedDaysCount = self.viewModel.getDaysAmount(tracker)
-            let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
-            cell.updateUI(isCompleted: isCompleted, daysCount: updatedDaysCount)
+            cell.updateUI(isCompleted: updatedIsCompleted, daysCount: updatedDaysCount, tracker: tracker)
         }
         
         return cell

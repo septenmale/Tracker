@@ -7,22 +7,6 @@
 
 import UIKit
 
-struct GeometricParams {
-    let cellCount: Int
-    let leftInset: CGFloat
-    let rightInset: CGFloat
-    let cellSpacing: CGFloat
-    let paddingWidth: CGFloat
-    
-    init(cellCount: Int, leftInset: CGFloat, rightInset: CGFloat, cellSpacing: CGFloat) {
-        self.cellCount = cellCount
-        self.leftInset = leftInset
-        self.rightInset = rightInset
-        self.cellSpacing = cellSpacing
-        self.paddingWidth = leftInset + rightInset + CGFloat(cellCount - 1) * cellSpacing
-    }
-}
-
 final class TrackersViewController: UIViewController {
     
     override func viewDidLoad() {
@@ -144,7 +128,6 @@ final class TrackersViewController: UIViewController {
         collectionView.dataSource = self
         
         collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.reuseIdentifier)
-//        collectionView.register(CollectionFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: CollectionFooter.reuseIdentifier)
         collectionView.register(TrackersCell.self, forCellWithReuseIdentifier: TrackersCell.reuseIdentifier)
     }
     
@@ -175,9 +158,35 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let cell else { return UICollectionViewCell() }
         
         let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
-        cell.titleLabel.text = tracker.title
-        cell.emodjiLabel.text = tracker.emoji
-        //TODO: cell.daysAmountLabel.text =
+        let selectedDate = datePicker.date
+//        let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
+        let daysCount = viewModel.getDaysAmount(tracker)
+        
+        cell.trackerId = tracker.id
+//        cell.updateUI(isCompleted: isCompleted, daysCount: daysCount)
+        
+        cell.changeStateClosure = { [weak self] trackerId in
+            guard let self else { return }
+            
+            guard let tracker = self.viewModel.getTracker(by: trackerId) else { return }
+            //TODO: тут переделать isCompleted может быть старым
+//            if isCompleted {
+//                self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
+//            } else {
+//                self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
+//            }
+            if self.viewModel.isTrackerCompleted(tracker, on: selectedDate) {
+                    self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
+                } else {
+                    self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
+                }
+            
+            
+            let updatedDaysCount = self.viewModel.getDaysAmount(tracker)
+            let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
+            cell.updateUI(isCompleted: isCompleted, daysCount: updatedDaysCount)
+        }
+        
         return cell
     }
     //TODO: Refractor

@@ -61,6 +61,19 @@ final class TrackersViewModel {
             $0.id == tracker.id && $0.date == date
         })
     }
+    
+    func getDaysAmount(_ tracker: Tracker) -> Int {
+        return completedTrackers.filter { $0.id == tracker.id }.count
+    }
+    
+    func getTracker(by id: UUID) -> Tracker? {
+        for category in categories {
+            if let tracker = category.items.first(where: { $0.id == id }) {
+                return tracker
+            }
+        }
+        return nil
+    }
     // add new Tracker
     func addTracker() {
         // TODO: adding logic

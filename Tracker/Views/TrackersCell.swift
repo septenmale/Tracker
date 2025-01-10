@@ -11,6 +11,10 @@ final class TrackersCell: UICollectionViewCell {
     
     static let reuseIdentifier = "TrackersCell"
     
+    var changeStateClosure: ((UUID) -> Void)?
+    
+    var trackerId: UUID?
+    
     private let trackerContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "Color selection 5")
@@ -22,14 +26,12 @@ final class TrackersCell: UICollectionViewCell {
     let emodjiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        label.text = "😀"
         return label
     }()
     
     let titleLabel: UILabel = {
         let lable = UILabel()
         lable.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        lable.text = "Sabaka"
         lable.textColor = .white
         return lable
     }()
@@ -48,12 +50,13 @@ final class TrackersCell: UICollectionViewCell {
         return label
     }()
     
-    let addAsCompleteButton: UIButton = {
+    lazy var addAsCompleteButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
         button.tintColor = UIColor(named: "Color selection 5")
         button.layer.cornerRadius = 17
         button.layer.masksToBounds = true
+        button.addTarget(self, action: #selector(changeTrackerState), for: .touchUpInside)
         return button
     }()
     
@@ -68,6 +71,22 @@ final class TrackersCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func changeTrackerState() {
+        
+//        let isCompleted = addAsCompleteButton.image(for: .normal) == UIImage(systemName: "plus.circle.fill")
+//        
+//        addAsCompleteButton.setImage(UIImage(systemName: isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"),
+//                                     for: .normal)
+        guard let trackerId else { return }
+        changeStateClosure?(trackerId)
+    }
+    
+    func updateUI(isCompleted: Bool, daysCount: Int) {
+        let buttonImage = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
+        addAsCompleteButton.setImage(UIImage(systemName: buttonImage), for: .normal)
+        daysAmountLabel.text = "\(daysCount) \(daysCount == 1 ? "день" : "дней")"
     }
     
     private func setupStackView() {
@@ -106,6 +125,7 @@ final class TrackersCell: UICollectionViewCell {
             titleLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor, constant: -12),
             
+            addAsCompleteButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -12),
             addAsCompleteButton.widthAnchor.constraint(equalToConstant: 34),
             addAsCompleteButton.heightAnchor.constraint(equalToConstant: 34),
             
@@ -113,6 +133,9 @@ final class TrackersCell: UICollectionViewCell {
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            
+            daysAmountLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 12)
+            
         ])
     }
     

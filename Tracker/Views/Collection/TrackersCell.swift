@@ -81,6 +81,7 @@ final class TrackersCell: UICollectionViewCell {
     func updateUI(isCompleted: Bool, daysCount: Int, tracker: Tracker) {
         let buttonImage = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
         addAsCompleteButton.setImage(UIImage(systemName: buttonImage), for: .normal)
+        addAsCompleteButton.alpha = isCompleted ? 0.6 : 1
         daysAmountLabel.text = "\(daysCount) \(daysCount == 1 ? "день" : "дней")"
         emodjiLabel.text = tracker.emoji
         titleLabel.text = tracker.title

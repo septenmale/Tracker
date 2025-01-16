@@ -29,7 +29,6 @@ final class TrackerTypeViewController: UIViewController {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 16
-        stackView.alignment = .center
         return stackView
     }()
     
@@ -58,11 +57,13 @@ final class TrackerTypeViewController: UIViewController {
     }()
     //TODO: Add switchToHabbitController logic
     @objc private func switchToHabbitController() {
-        
+        let newHabitViewController = NewHabitViewController()
+        present(newHabitViewController, animated: true)
     }
     //TODO: Add switchToEventController logic
     @objc private func switchToEventController() {
-        
+        let newEventViewController = NewEventViewController()
+        present(newEventViewController, animated: true)
     }
     
     private func setupStackView() {

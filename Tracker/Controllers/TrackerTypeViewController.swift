@@ -55,12 +55,12 @@ final class TrackerTypeViewController: UIViewController {
         button.addTarget(self, action: #selector(switchToEventController), for: .touchUpInside)
         return button
     }()
-    //TODO: Add switchToHabbitController logic
+    
     @objc private func switchToHabbitController() {
         let newHabitViewController = NewHabitViewController()
         present(newHabitViewController, animated: true)
     }
-    //TODO: Add switchToEventController logic
+    
     @objc private func switchToEventController() {
         let newEventViewController = NewEventViewController()
         present(newEventViewController, animated: true)

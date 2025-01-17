@@ -18,12 +18,13 @@ final class NewHabitViewController: UIViewController {
         setupConstraints()
     }
     
-    private let tableView = UITableView(frame: .zero, style: .plain)
-    private let items = [
+    private lazy var tableView = UITableView(frame: .zero, style: .plain)
+    private var items = [
         ("Категория", ""),
         ("Расписание", "")
     ]
     
+    private var selectedDays: [Int] = []
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -78,6 +79,22 @@ final class NewHabitViewController: UIViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
+    
+    private func updateScheduleSubtitle(_ selectedDays: [Int]) {
+        let weekdaysShort = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        
+        if selectedDays.count == weekdaysShort.count {
+            items[1].1 = "каждый день"
+        } else {
+            var sortedDays = [String]()
+            for day in selectedDays.sorted() {
+                sortedDays.append(weekdaysShort[day])
+            }
+            let dayNames = sortedDays.joined(separator: ", ")
+            items[1].1 = dayNames
+        }
+        tableView.reloadData()
+    }
     
     private func setupTableView() {
         tableView.delegate = self
@@ -162,18 +179,20 @@ extension NewHabitViewController: UITableViewDelegate {
         } else {
             cell.separatorInset = UIEdgeInsets.zero
         }
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch indexPath.row {
-        case 0:
-            break
+        if indexPath.row == 1 {
+            let scheduleVC = ScheduleViewController()
+            scheduleVC.selectedWeekdays = selectedDays
             
-        case 1:
-            let scheduleViewController = ScheduleViewController()
-            present(scheduleViewController, animated: true)
-        default:
-            break
+            scheduleVC.onDaysSelected = { [weak self] days in
+                self?.selectedDays = days
+                self?.updateScheduleSubtitle(days)
+            }
+            
+            present(scheduleVC, animated: true)
         }
     }
     

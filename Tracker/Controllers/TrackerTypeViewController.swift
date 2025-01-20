@@ -9,6 +9,18 @@ import UIKit
 
 final class TrackerTypeViewController: UIViewController {
     
+    private let viewModel: TrackersViewModel
+    weak var delegate: NewHabitDelegate?
+    
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -57,7 +69,8 @@ final class TrackerTypeViewController: UIViewController {
     }()
     
     @objc private func switchToHabbitController() {
-        let newHabitViewController = NewHabitViewController()
+        let newHabitViewController = NewHabitViewController(viewModel: self.viewModel)
+        newHabitViewController.delegate = delegate
         present(newHabitViewController, animated: true)
     }
     

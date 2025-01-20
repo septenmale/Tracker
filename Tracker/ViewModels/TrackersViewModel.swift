@@ -10,43 +10,16 @@ import Foundation
 final class TrackersViewModel {
     
     private var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = []
-    
-    init() {
-        
-        let tracker1 = Tracker(
-            id: UUID(),
-            title: "Сделать зарядку",
-            color: "blue",
-            emoji: "💪",
-            schedule: [.monday, .wednesday, .friday]
-        )
-        
-        let tracker2 = Tracker(
-            id: UUID(),
-            title: "Читать книгу",
-            color: "green",
-            emoji: "📖",
-            schedule: [.tuesday, .thursday, .saturday]
-        )
-        
-        let tracker3 = Tracker(
-            id: UUID(),
-            title: "Не делать зарядку",
-            color: "blue",
-            emoji: "💪",
-            schedule: [.monday, .wednesday, .friday]
-        )
-        
-        let category = TrackerCategory(title: "Здоровье", items: [tracker1, tracker2, tracker3])
-        categories = [category]
-    }
+    var categories: [TrackerCategory] = [TrackerCategory(
+        title: "По умолчанию",
+        items: [])
+    ]
     
     func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
-        // create new record
+        
         let newRecord = TrackerRecord(id: tracker.id, date: startOfDay)
-        // adding to array immutable
+        
         completedTrackers = completedTrackers + [newRecord]
     }
     
@@ -72,9 +45,42 @@ final class TrackersViewModel {
         }
         return nil
     }
-    // add new Tracker
-    func addTracker() {
-        // TODO: adding logic
+    
+    func addTracker(title: String, schedule: [Int]) {
+        
+        let weekdays: [Weekday] = schedule.compactMap { index in
+            switch index {
+            case 0: return .monday
+            case 1: return .tuesday
+            case 2: return .wednesday
+            case 3: return .thursday
+            case 4: return .friday
+            case 5: return .saturday
+            case 6: return .sunday
+            default: return nil
+            }
+        }
+        
+        let newTracker = Tracker(
+            id: UUID(),
+            title: title,
+            color: "green",
+            emoji: "📖",
+            schedule: weekdays
+        )
+        
+        let defaultCategory = categories[0]
+        let updatedCategory = TrackerCategory(
+            title: defaultCategory.title,
+            items: defaultCategory.items + [newTracker]
+        )
+        
+        categories = [updatedCategory]
+        
+        let scheduleString = weekdays.map { $0.rawValue.capitalized }.joined(separator: ", ")
+        print("New tracker created: \(title)")
+        print("Scheduled days: \(scheduleString)")
+        
     }
     
     func getTrackers(for date: Date) -> [TrackerCategory] {

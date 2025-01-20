@@ -36,7 +36,8 @@ final class TrackersViewController: UIViewController {
     private let searchController: UISearchController = {
         let searchController = UISearchController()
         searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search..."
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.placeholder = "Поиск"
         return searchController
     }()
     
@@ -77,7 +78,8 @@ final class TrackersViewController: UIViewController {
     }()
     
     @objc private func addTracker() {
-        let trackerTypeViewController = TrackerTypeViewController()
+        let trackerTypeViewController = TrackerTypeViewController(viewModel: self.viewModel)
+        trackerTypeViewController.delegate = self
         present(trackerTypeViewController, animated: true)
     }
     // TODO: add picked date logic
@@ -147,5 +149,12 @@ final class TrackersViewController: UIViewController {
 extension TrackersViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         
+    }
+}
+
+extension TrackersViewController: NewHabitDelegate {
+    func didCreateNewTracker() {
+        updateTrackers(for: Date())
+        setupUIBasedOnData()
     }
 }

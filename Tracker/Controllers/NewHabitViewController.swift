@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol NewHabitDelegate: AnyObject {
+    func didCreateNewTracker()
+}
+
 final class NewHabitViewController: UIViewController {
     
     override func viewDidLoad() {
@@ -16,6 +20,19 @@ final class NewHabitViewController: UIViewController {
         setupStackView()
         setupTableView()
         setupConstraints()
+    }
+    
+    weak var delegate: NewHabitDelegate?
+    
+    private let viewModel: TrackersViewModel
+    
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
@@ -41,6 +58,11 @@ final class NewHabitViewController: UIViewController {
         textField.layer.cornerRadius = 16
         textField.layer.masksToBounds = false
         textField.translatesAutoresizingMaskIntoConstraints = false
+        
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
+        
         return textField
     }()
     
@@ -76,6 +98,7 @@ final class NewHabitViewController: UIViewController {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 8
+        stackView.distribution = .fillEqually
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -142,10 +165,7 @@ final class NewHabitViewController: UIViewController {
             tableView.heightAnchor.constraint(equalToConstant: 150),
             
             createButton.heightAnchor.constraint(equalToConstant: 60),
-            createButton.widthAnchor.constraint(equalToConstant: 161),
-            
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
-            cancelButton.widthAnchor.constraint(equalToConstant: 166),
             
             buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -158,10 +178,28 @@ final class NewHabitViewController: UIViewController {
     
     @objc private  func createNewEvent() {
         
+        guard let habitName = textField.text, !habitName.isEmpty else {
+            //TODO: Show alert
+            return
+        }
+        
+        guard !selectedDays.isEmpty else {
+            //TODO: Show alert
+            return
+        }
+        
+        print("Tracker name: \(habitName)")
+        print("These days were selected: \(selectedDays)")
+        
+        viewModel.addTracker(title: habitName, schedule: selectedDays)
+        delegate?.didCreateNewTracker()
+        
+        presentingViewController?.presentingViewController?.dismiss(animated: true)
+        
     }
     
     @objc private func backToTrackerTypeVC() {
-        
+        dismiss(animated: true)
     }
     
 }
@@ -177,9 +215,10 @@ extension NewHabitViewController: UITableViewDelegate {
         if indexPath.row == items.count - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
         } else {
-            cell.separatorInset = UIEdgeInsets.zero
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         }
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        
+        cell.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

@@ -199,7 +199,7 @@ final class NewHabitViewController: UIViewController {
     }
     
     @objc private func backToTrackerTypeVC() {
-        dismiss(animated: true)
+        presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
 }

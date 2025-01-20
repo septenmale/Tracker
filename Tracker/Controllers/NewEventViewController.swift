@@ -142,7 +142,7 @@ final class NewEventViewController: UIViewController {
     }
     
     @objc private func backToTrackerTypeVC() {
-        
+        presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
 }

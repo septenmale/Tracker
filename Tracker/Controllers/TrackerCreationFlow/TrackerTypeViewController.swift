@@ -10,7 +10,7 @@ import UIKit
 final class TrackerTypeViewController: UIViewController {
     
     private let viewModel: TrackersViewModel
-    weak var delegate: NewHabitDelegate?
+    weak var delegate: NewTrackerDelegate?
     
     init(viewModel: TrackersViewModel) {
         self.viewModel = viewModel
@@ -44,7 +44,7 @@ final class TrackerTypeViewController: UIViewController {
         return stackView
     }()
     
-    lazy private var habbitButton: UIButton = {
+    lazy private var habitButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Привычка", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -75,7 +75,8 @@ final class TrackerTypeViewController: UIViewController {
     }
     
     @objc private func switchToEventController() {
-        let newEventViewController = NewEventViewController()
+        let newEventViewController = NewEventViewController(viewModel: self.viewModel)
+        newEventViewController.delegate = delegate
         present(newEventViewController, animated: true)
     }
     
@@ -83,7 +84,7 @@ final class TrackerTypeViewController: UIViewController {
         view.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        stackView.addArrangedSubview(habbitButton)
+        stackView.addArrangedSubview(habitButton)
         stackView.addArrangedSubview(eventButton)
     }
     
@@ -96,8 +97,8 @@ final class TrackerTypeViewController: UIViewController {
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
-            habbitButton.heightAnchor.constraint(equalToConstant: 60),
-            habbitButton.widthAnchor.constraint(equalToConstant: 335),
+            habitButton.heightAnchor.constraint(equalToConstant: 60),
+            habitButton.widthAnchor.constraint(equalToConstant: 335),
             
             eventButton.heightAnchor.constraint(equalToConstant: 60),
             eventButton.widthAnchor.constraint(equalToConstant: 335),

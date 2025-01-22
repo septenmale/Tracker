@@ -152,7 +152,7 @@ extension TrackersViewController: UISearchResultsUpdating {
     }
 }
 
-extension TrackersViewController: NewHabitDelegate {
+extension TrackersViewController: NewTrackerDelegate {
     func didCreateNewTracker() {
         updateTrackers(for: Date())
         setupUIBasedOnData()

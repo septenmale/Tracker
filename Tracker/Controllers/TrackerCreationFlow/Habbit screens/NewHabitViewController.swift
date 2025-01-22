@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol NewHabitDelegate: AnyObject {
-    func didCreateNewTracker()
-}
-
 final class NewHabitViewController: UIViewController {
     
     override func viewDidLoad() {
@@ -23,7 +19,7 @@ final class NewHabitViewController: UIViewController {
         setupConstraints()
     }
     
-    weak var delegate: NewHabitDelegate?
+    weak var delegate: NewTrackerDelegate?
     
     private let viewModel: TrackersViewModel
     
@@ -158,9 +154,6 @@ final class NewHabitViewController: UIViewController {
             //TODO: Show alert
             return
         }
-        
-        print("Tracker name: \(habitName)")
-        print("These days were selected: \(selectedDays)")
         
         viewModel.addTracker(title: habitName, schedule: selectedDays)
         delegate?.didCreateNewTracker()

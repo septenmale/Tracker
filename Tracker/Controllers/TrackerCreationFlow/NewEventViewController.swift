@@ -19,10 +19,23 @@ final class NewEventViewController: UIViewController {
         setupConstraints()
     }
     
+    weak var delegate: NewTrackerDelegate?
+    
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let items = [
         ("Категория", "")
     ]
+    
+    private let viewModel: TrackersViewModel
+    
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -169,6 +182,15 @@ final class NewEventViewController: UIViewController {
     
     @objc private  func createNewEvent() {
         
+        guard let eventName = textField.text, !eventName.isEmpty else {
+            // TODO: Show alert
+            return
+        }
+        
+        viewModel.addTracker(title: eventName, schedule: [])
+        delegate?.didCreateNewTracker()
+        
+        presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
     @objc private func backToTrackerTypeVC() {

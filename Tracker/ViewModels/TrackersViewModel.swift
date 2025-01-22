@@ -37,7 +37,7 @@ final class TrackersViewModel {
         return completedTrackers.filter { $0.id == tracker.id }.count
     }
     
-    func getTracker(by id: UUID) -> Tracker? {
+    func verifyTracker(by id: UUID) -> Tracker? {
         for category in categories {
             if let tracker = category.items.first(where: { $0.id == id }) {
                 return tracker
@@ -77,10 +77,6 @@ final class TrackersViewModel {
         
         categories = [updatedCategory]
         
-        let scheduleString = weekdays.map { $0.rawValue.capitalized }.joined(separator: ", ")
-        print("New tracker created: \(title)")
-        print("Scheduled days: \(scheduleString)")
-        
     }
     
     func getTrackers(for date: Date) -> [TrackerCategory] {
@@ -88,11 +84,17 @@ final class TrackersViewModel {
         
         let weekdayIndex = Calendar.current.component(.weekday, from: date)
         let currentWeekday = weekdayFromIndex(weekdayIndex)
+        let startOfDay = Calendar.current.startOfDay(for: date)
         
         for category in categories {
-            let filteredItems = category.items.filter({ (tracker: Tracker) -> Bool in
-                return tracker.schedule.contains(currentWeekday)
-            })
+            let filteredItems = category.items.filter { tracker in
+                if tracker.schedule.isEmpty {
+                    return !completedTrackers.contains { $0.id == tracker.id } ||
+                    completedTrackers.contains { $0.id == tracker.id && $0.date == startOfDay }
+                } else {
+                    return tracker.schedule.contains(currentWeekday)
+                }
+            }
             
             if !filteredItems.isEmpty {
                 filteredCategories.append(TrackerCategory(title: category.title, items: filteredItems))

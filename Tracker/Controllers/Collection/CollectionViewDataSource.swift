@@ -33,7 +33,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         cell.changeStateClosure = { [weak self] trackerId in
             guard let self else { return }
-            guard let tracker = self.viewModel.getTracker(by: trackerId) else { return }
+            guard let tracker = self.viewModel.verifyTracker(by: trackerId) else { return }
 
             let selectedDate = Calendar.current.startOfDay(for: datePicker.date)
             guard selectedDate <= currentDate else { return }

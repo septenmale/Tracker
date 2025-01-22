@@ -178,6 +178,7 @@ final class NewHabitViewController: UIViewController {
         tableView.layer.masksToBounds = false
         tableView.clipsToBounds = true
         tableView.backgroundColor = .tBackground
+        tableView.isScrollEnabled = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
     

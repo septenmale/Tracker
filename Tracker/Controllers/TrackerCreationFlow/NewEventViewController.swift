@@ -130,6 +130,7 @@ final class NewEventViewController: UIViewController {
         tableView.clipsToBounds = true
         tableView.separatorStyle = .none
         tableView.backgroundColor = .tBackground
+        tableView.isScrollEnabled = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
     

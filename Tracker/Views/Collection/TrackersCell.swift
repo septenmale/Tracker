@@ -47,16 +47,20 @@ final class TrackersCell: UICollectionViewCell {
         let label = UILabel()
         label.text = "1 день"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     lazy var addAsCompleteButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        let imageConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .light, scale: .small)
+        button.setPreferredSymbolConfiguration(imageConfig, forImageIn: .normal)
         button.tintColor = UIColor(named: "Color selection 5")
-        button.layer.cornerRadius = 17
+        button.layer.cornerRadius = 14
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(changeTrackerState), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -126,6 +130,7 @@ final class TrackersCell: UICollectionViewCell {
             addAsCompleteButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -12),
             addAsCompleteButton.widthAnchor.constraint(equalToConstant: 34),
             addAsCompleteButton.heightAnchor.constraint(equalToConstant: 34),
+            addAsCompleteButton.widthAnchor.constraint(equalTo: addAsCompleteButton.heightAnchor),
             
             stackView.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: 8),
             stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),

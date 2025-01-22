@@ -5,7 +5,7 @@
 //  Created by Viktor Zavhorodnii on 09/01/2025.
 //
 
-import CoreFoundation
+import Foundation
 
 struct GeometricParams {
     let cellCount: Int

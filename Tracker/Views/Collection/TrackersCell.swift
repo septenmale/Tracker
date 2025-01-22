@@ -23,27 +23,27 @@ final class TrackersCell: UICollectionViewCell {
         return view
     }()
     
-    let emodjiLabel: UILabel = {
+    private let emodjiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return label
     }()
     
-    let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let lable = UILabel()
         lable.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         lable.textColor = .white
         return lable
     }()
     
-    let stackView: UIStackView = {
+    private let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 8
         return stackView
     }()
     
-    let daysAmountLabel: UILabel = {
+    private let daysAmountLabel: UILabel = {
         let label = UILabel()
         label.text = "1 день"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
@@ -51,7 +51,7 @@ final class TrackersCell: UICollectionViewCell {
         return label
     }()
     
-    lazy var addAsCompleteButton: UIButton = {
+    private lazy var addAsCompleteButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "plus"), for: .normal)
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .light, scale: .small)
@@ -133,8 +133,8 @@ final class TrackersCell: UICollectionViewCell {
             addAsCompleteButton.widthAnchor.constraint(equalTo: addAsCompleteButton.heightAnchor),
             
             stackView.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: 8),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            stackView.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             daysAmountLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 12)

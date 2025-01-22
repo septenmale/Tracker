@@ -16,6 +16,7 @@ final class NewHabitViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        textField.delegate = self
         
         setupStackView()
         setupTableView()
@@ -66,6 +67,16 @@ final class NewHabitViewController: UIViewController {
         return textField
     }()
     
+    private lazy var warningLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ограничение 38 символов"
+        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.textColor = .tRed
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
@@ -75,7 +86,7 @@ final class NewHabitViewController: UIViewController {
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = false
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(createNewEvent), for: .touchUpInside)
+        button.addTarget(self, action: #selector(createNewHabit), for: .touchUpInside)
         return button
     }()
     
@@ -116,7 +127,50 @@ final class NewHabitViewController: UIViewController {
             let dayNames = sortedDays.joined(separator: ", ")
             items[1].1 = dayNames
         }
+        
+        changeCreateButtonState()
         tableView.reloadData()
+    }
+    
+    private func changeCreateButtonState() {
+        
+        let isTextFieldValid = !(textField.text?.isEmpty ?? true)
+        let isScheduleValid = !selectedDays.isEmpty
+        
+        if isTextFieldValid && isScheduleValid {
+            createButton.backgroundColor = .blackDay
+            createButton.isEnabled = true
+        } else {
+            createButton.backgroundColor = .tGray
+            createButton.isEnabled = false
+        }
+        
+    }
+    
+    @objc private  func createNewHabit() {
+        
+        guard let habitName = textField.text, !habitName.isEmpty else {
+            //TODO: Show alert
+            return
+        }
+        
+        guard !selectedDays.isEmpty else {
+            //TODO: Show alert
+            return
+        }
+        
+        print("Tracker name: \(habitName)")
+        print("These days were selected: \(selectedDays)")
+        
+        viewModel.addTracker(title: habitName, schedule: selectedDays)
+        delegate?.didCreateNewTracker()
+        
+        presentingViewController?.presentingViewController?.dismiss(animated: true)
+        
+    }
+    
+    @objc private func backToTrackerTypeVC() {
+        presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
     private func setupTableView() {
@@ -146,6 +200,7 @@ final class NewHabitViewController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(textField)
         view.addSubview(tableView)
+        view.addSubview(warningLabel)
         
         NSLayoutConstraint.activate([
             
@@ -158,8 +213,12 @@ final class NewHabitViewController: UIViewController {
             textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             textField.heightAnchor.constraint(equalToConstant: 75),
             
+            warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 8),
+            warningLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -32),
+            
             tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
+            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 62),
             tableView.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 150),
@@ -174,32 +233,6 @@ final class NewHabitViewController: UIViewController {
             
         ])
         
-    }
-    
-    @objc private  func createNewEvent() {
-        
-        guard let habitName = textField.text, !habitName.isEmpty else {
-            //TODO: Show alert
-            return
-        }
-        
-        guard !selectedDays.isEmpty else {
-            //TODO: Show alert
-            return
-        }
-        
-        print("Tracker name: \(habitName)")
-        print("These days were selected: \(selectedDays)")
-        
-        viewModel.addTracker(title: habitName, schedule: selectedDays)
-        delegate?.didCreateNewTracker()
-        
-        presentingViewController?.presentingViewController?.dismiss(animated: true)
-        
-    }
-    
-    @objc private func backToTrackerTypeVC() {
-        presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
 }
@@ -260,6 +293,29 @@ extension NewHabitViewController: UITableViewDataSource {
         cell.accessoryType = .disclosureIndicator
         
         return cell
+    }
+    
+}
+
+extension NewHabitViewController : UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let maxLength = 38
+        let currentText = textField.text ?? ""
+        
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        
+        guard updatedText.count <= maxLength else { warningLabel.isHidden = false; return false }
+        warningLabel.isHidden = true
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        warningLabel.isHidden = true
+        changeCreateButtonState()
+        return true
     }
     
 }

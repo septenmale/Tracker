@@ -12,6 +12,7 @@ final class NewEventViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        textField.delegate = self
         
         setupStackView()
         setupTableView()
@@ -44,6 +45,16 @@ final class NewEventViewController: UIViewController {
         textField.leftViewMode = .always
         
         return textField
+    }()
+    
+    private lazy var warningLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ограничение 38 символов"
+        label.font = .systemFont(ofSize: 17, weight: .regular)
+        label.textColor = .tRed
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     private lazy var createButton: UIButton = {
@@ -83,6 +94,20 @@ final class NewEventViewController: UIViewController {
         return stackView
     }()
     
+    private func changeCreateButtonState() {
+        
+        let isTextFieldValid = !(textField.text?.isEmpty ?? true)
+        
+        if isTextFieldValid {
+            createButton.backgroundColor = .blackDay
+            createButton.isEnabled = true
+        } else {
+            createButton.backgroundColor = .tGray
+            createButton.isEnabled = false
+        }
+        
+    }
+    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -106,6 +131,7 @@ final class NewEventViewController: UIViewController {
         
         view.addSubview(titleLabel)
         view.addSubview(textField)
+        view.addSubview(warningLabel)
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
@@ -119,8 +145,12 @@ final class NewEventViewController: UIViewController {
             textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             textField.heightAnchor.constraint(equalToConstant: 75),
             
+            warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 8),
+            warningLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -32),
+            
             tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
+            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 62),
             tableView.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 75),
@@ -197,6 +227,29 @@ extension NewEventViewController: UITableViewDataSource {
         cell.accessoryType = .disclosureIndicator
         
         return cell
+    }
+    
+}
+
+extension NewEventViewController : UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let maxLength = 38
+        let currentText = textField.text ?? ""
+        
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        
+        guard updatedText.count <= maxLength else { warningLabel.isHidden = false; return false }
+        warningLabel.isHidden = true
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        warningLabel.isHidden = true
+        changeCreateButtonState()
+        return true
     }
     
 }

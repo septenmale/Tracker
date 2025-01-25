@@ -16,6 +16,7 @@ final class NewHabitViewController: UIViewController {
         
         setupStackView()
         setupTableView()
+        setupEmojiCollectionView()
         setupConstraints()
     }
     
@@ -31,6 +32,14 @@ final class NewHabitViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    private lazy var emojiCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private lazy var colorsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    
+    let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
+    let colorsCollectionViewItems: [UIColor] = [
+        UIColor.collectionColor1,UIColor.collectionColor2,UIColor.collectionColor3,UIColor.collectionColor4,UIColor.collectionColor5,UIColor.collectionColor6,UIColor.collectionColor7,UIColor.collectionColor8,UIColor.collectionColor9,UIColor.collectionColor10,UIColor.collectionColor11,UIColor.collectionColor12,UIColor.collectionColor13,UIColor.collectionColor14,UIColor.collectionColor15,UIColor.collectionColor16,UIColor.collectionColor17,UIColor.collectionColor18
+    ]
     
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     private var items = [
@@ -182,6 +191,18 @@ final class NewHabitViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    private func setupEmojiCollectionView() {
+        
+        emojiCollectionView.dataSource = self
+        emojiCollectionView.delegate = self
+        
+        emojiCollectionView.register(EmojiCollectionCell.self, forCellWithReuseIdentifier: EmojiCollectionCell.reuseIdentifier)
+        emojiCollectionView.register(EmojiCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier)
+        
+        view.addSubview(emojiCollectionView)
+        emojiCollectionView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
     private func setupStackView() {
         view.addSubview(buttonStackView)
         
@@ -206,16 +227,21 @@ final class NewHabitViewController: UIViewController {
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             textField.heightAnchor.constraint(equalToConstant: 75),
-            
+            // TODO: Проверять есть ли футер у textField если да сделать warningLabel футером
             warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 8),
-            warningLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -32),
+            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
             
             tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 62),
+            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 150),
+            
+            emojiCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emojiCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor),
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             createButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),

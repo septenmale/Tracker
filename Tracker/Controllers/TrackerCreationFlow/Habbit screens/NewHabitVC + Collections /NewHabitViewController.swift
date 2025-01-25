@@ -13,10 +13,11 @@ final class NewHabitViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
+        emojiCollectionView.isHidden = true
         
         setupStackView()
         setupTableView()
-        setupEmojiCollectionView()
+        setupEmojiAndColorCollectionViews()
         setupConstraints()
     }
     
@@ -33,8 +34,8 @@ final class NewHabitViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private lazy var emojiCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    private lazy var colorsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    lazy var emojiCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    lazy var colorsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
     let colorsCollectionViewItems: [UIColor] = [
@@ -191,16 +192,23 @@ final class NewHabitViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private func setupEmojiCollectionView() {
+    private func setupEmojiAndColorCollectionViews() {
         
         emojiCollectionView.dataSource = self
         emojiCollectionView.delegate = self
+        colorsCollectionView.delegate = self
+        colorsCollectionView.dataSource = self
         
         emojiCollectionView.register(EmojiCollectionCell.self, forCellWithReuseIdentifier: EmojiCollectionCell.reuseIdentifier)
         emojiCollectionView.register(EmojiCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier)
+        colorsCollectionView.register(ColorsCollectionCell.self, forCellWithReuseIdentifier: ColorsCollectionCell.reuseIdentifier)
+        colorsCollectionView.register(ColorsCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: ColorsCollectionHeader.reuseIdentifier)
         
         view.addSubview(emojiCollectionView)
         emojiCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(colorsCollectionView)
+        colorsCollectionView.translatesAutoresizingMaskIntoConstraints = false
+
     }
     
     private func setupStackView() {
@@ -242,6 +250,12 @@ final class NewHabitViewController: UIViewController {
             emojiCollectionView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor),
             emojiCollectionView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            
+            colorsCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            colorsCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
+            colorsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 18),
+            colorsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -18),
+            colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             createButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),

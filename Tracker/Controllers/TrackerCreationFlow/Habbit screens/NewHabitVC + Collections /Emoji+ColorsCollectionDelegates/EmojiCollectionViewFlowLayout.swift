@@ -10,7 +10,7 @@ import UIKit
 extension NewHabitViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 24)
+        UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 0)
     }
 
     

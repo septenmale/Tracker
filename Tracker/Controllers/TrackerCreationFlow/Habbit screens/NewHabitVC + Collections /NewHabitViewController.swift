@@ -13,12 +13,19 @@ final class NewHabitViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
-        emojiCollectionView.isHidden = true
+//        emojiCollectionView.isHidden = true
         
+        setupElementsInScrollView()
         setupStackView()
         setupTableView()
         setupEmojiAndColorCollectionViews()
         setupConstraints()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        print("ContentView frame: \(contentView.frame)")
+        print("ScrollView contentSize: \(scrollView.contentSize)")
     }
     
     weak var delegate: NewTrackerDelegate?
@@ -56,6 +63,18 @@ final class NewHabitViewController: UIViewController {
         label.text = "Новая привычка"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private let textField: UITextField = {
@@ -176,6 +195,22 @@ final class NewHabitViewController: UIViewController {
         presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
+    private func setupElementsInScrollView() {
+        view.addSubview(titleLabel)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.layer.borderWidth = 1
+        contentView.layer.borderColor = UIColor.red.cgColor
+        contentView.addSubview(textField)
+        contentView.addSubview(warningLabel)
+        contentView.addSubview(tableView)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorsCollectionView)
+        contentView.addSubview(buttonStackView)
+        
+    }
+    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -199,20 +234,23 @@ final class NewHabitViewController: UIViewController {
         colorsCollectionView.delegate = self
         colorsCollectionView.dataSource = self
         
+        emojiCollectionView.isScrollEnabled = false
+        colorsCollectionView.isScrollEnabled = false
+        
         emojiCollectionView.register(EmojiCollectionCell.self, forCellWithReuseIdentifier: EmojiCollectionCell.reuseIdentifier)
         emojiCollectionView.register(EmojiCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier)
         colorsCollectionView.register(ColorsCollectionCell.self, forCellWithReuseIdentifier: ColorsCollectionCell.reuseIdentifier)
         colorsCollectionView.register(ColorsCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: ColorsCollectionHeader.reuseIdentifier)
         
-        view.addSubview(emojiCollectionView)
+//        view.addSubview(emojiCollectionView)
         emojiCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(colorsCollectionView)
+//        view.addSubview(colorsCollectionView)
         colorsCollectionView.translatesAutoresizingMaskIntoConstraints = false
 
     }
     
     private func setupStackView() {
-        view.addSubview(buttonStackView)
+//        view.addSubview(buttonStackView)
         
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
@@ -220,50 +258,62 @@ final class NewHabitViewController: UIViewController {
     
     private func setupConstraints() {
         
-        view.addSubview(titleLabel)
-        view.addSubview(textField)
-        view.addSubview(tableView)
-        view.addSubview(warningLabel)
+//        view.addSubview(titleLabel)
+//        view.addSubview(textField)
+//        view.addSubview(tableView)
+//        view.addSubview(warningLabel)
         
         NSLayoutConstraint.activate([
             
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
-            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            textField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             textField.heightAnchor.constraint(equalToConstant: 75),
             // TODO: Проверять есть ли футер у textField если да сделать warningLabel футером
-            warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            warningLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
             
-            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 150),
             
-            emojiCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emojiCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emojiCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -18),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
-            colorsCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            colorsCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
-            colorsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 18),
-            colorsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -18),
+            colorsCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            colorsCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 34),
+            colorsCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
+            colorsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -18),
             colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             createButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
-            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            buttonStackView.topAnchor.constraint(equalTo: colorsCollectionView.bottomAnchor, constant: 16),
+            buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
             
         ])
         

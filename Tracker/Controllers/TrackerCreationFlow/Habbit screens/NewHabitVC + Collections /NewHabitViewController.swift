@@ -22,12 +22,6 @@ final class NewHabitViewController: UIViewController {
         setupConstraints()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        print("ContentView frame: \(contentView.frame)")
-        print("ScrollView contentSize: \(scrollView.contentSize)")
-    }
-    
     weak var delegate: NewTrackerDelegate?
     
     private let viewModel: TrackersViewModel
@@ -200,8 +194,6 @@ final class NewHabitViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor.red.cgColor
         contentView.addSubview(textField)
         contentView.addSubview(warningLabel)
         contentView.addSubview(tableView)
@@ -280,9 +272,9 @@ final class NewHabitViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
             textField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            textField.topAnchor.constraint(equalTo: contentView.topAnchor),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 75),
             // TODO: Проверять есть ли футер у textField если да сделать warningLabel футером
             warningLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -296,25 +288,25 @@ final class NewHabitViewController: UIViewController {
             
             emojiCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             emojiCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -18),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             colorsCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             colorsCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 34),
-            colorsCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 18),
-            colorsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -18),
+            colorsCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
+            colorsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
             colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
             createButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
+            buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             buttonStackView.topAnchor.constraint(equalTo: colorsCollectionView.bottomAnchor, constant: 16),
             buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
-            
+            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
+                        
         ])
         
     }

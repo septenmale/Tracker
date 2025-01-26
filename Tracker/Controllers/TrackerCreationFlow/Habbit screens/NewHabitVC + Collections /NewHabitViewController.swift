@@ -13,12 +13,10 @@ final class NewHabitViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
-//        emojiCollectionView.isHidden = true
         
         setupElementsInScrollView()
         setupStackView()
         setupTableView()
-        setupEmojiAndColorCollectionViews()
         setupConstraints()
     }
     
@@ -35,13 +33,9 @@ final class NewHabitViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    lazy var emojiCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    lazy var colorsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    private let emojiCollectionView = EmojiCollectionView()
     
-    let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
-    let colorsCollectionViewItems: [UIColor] = [
-        UIColor.collectionColor1,UIColor.collectionColor2,UIColor.collectionColor3,UIColor.collectionColor4,UIColor.collectionColor5,UIColor.collectionColor6,UIColor.collectionColor7,UIColor.collectionColor8,UIColor.collectionColor9,UIColor.collectionColor10,UIColor.collectionColor11,UIColor.collectionColor12,UIColor.collectionColor13,UIColor.collectionColor14,UIColor.collectionColor15,UIColor.collectionColor16,UIColor.collectionColor17,UIColor.collectionColor18
-    ]
+    private let colorsCollectionView = ColorsCollectionView()
     
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     private var items = [
@@ -219,41 +213,13 @@ final class NewHabitViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private func setupEmojiAndColorCollectionViews() {
-        
-        emojiCollectionView.dataSource = self
-        emojiCollectionView.delegate = self
-        colorsCollectionView.delegate = self
-        colorsCollectionView.dataSource = self
-        
-        emojiCollectionView.isScrollEnabled = false
-        colorsCollectionView.isScrollEnabled = false
-        
-        emojiCollectionView.register(EmojiCollectionCell.self, forCellWithReuseIdentifier: EmojiCollectionCell.reuseIdentifier)
-        emojiCollectionView.register(EmojiCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier)
-        colorsCollectionView.register(ColorsCollectionCell.self, forCellWithReuseIdentifier: ColorsCollectionCell.reuseIdentifier)
-        colorsCollectionView.register(ColorsCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: ColorsCollectionHeader.reuseIdentifier)
-        
-//        view.addSubview(emojiCollectionView)
-        emojiCollectionView.translatesAutoresizingMaskIntoConstraints = false
-//        view.addSubview(colorsCollectionView)
-        colorsCollectionView.translatesAutoresizingMaskIntoConstraints = false
-
-    }
-    
     private func setupStackView() {
-//        view.addSubview(buttonStackView)
         
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
     }
     
     private func setupConstraints() {
-        
-//        view.addSubview(titleLabel)
-//        view.addSubview(textField)
-//        view.addSubview(tableView)
-//        view.addSubview(warningLabel)
         
         NSLayoutConstraint.activate([
             
@@ -304,8 +270,8 @@ final class NewHabitViewController: UIViewController {
             buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             buttonStackView.topAnchor.constraint(equalTo: colorsCollectionView.bottomAnchor, constant: 16),
             buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
+            buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
+            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4)
                         
         ])
         

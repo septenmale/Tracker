@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// TODO: Создать экземпляр коллекций, добавить скролл вью
+
 final class ScheduleViewController: UIViewController {
     
     override func viewDidLoad() {

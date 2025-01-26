@@ -11,12 +11,16 @@ final class EmojiCollectionView: UICollectionView {
     
     let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
     
+    private(set) var selectedEmoji: String?
+    
     init() {
         super.init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         self.delegate = self
         self.dataSource = self
         self.isScrollEnabled = false
+        self.allowsMultipleSelection = false
+        
         self.register(EmojiCollectionCell.self, forCellWithReuseIdentifier: EmojiCollectionCell.reuseIdentifier)
         self.register(EmojiCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier)
         
@@ -58,6 +62,23 @@ extension EmojiCollectionView: UICollectionViewDataSource {
             fatalError("Unexpected supplementary element kind \(kind)")
         }
         
+    }
+}
+
+extension EmojiCollectionView: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        // TODO: убрать выделение для предидущего
+        let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell
+        selectedCell?.contentView.backgroundColor = .tLightGrey
+        
+        selectedEmoji = emojiCollectionViewItems[indexPath.item]
+
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell
+        selectedCell?.contentView.backgroundColor = .clear
     }
 }
 

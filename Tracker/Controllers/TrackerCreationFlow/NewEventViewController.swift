@@ -14,6 +14,7 @@ final class NewEventViewController: UIViewController {
         view.backgroundColor = .systemBackground
         textField.delegate = self
         
+        setupElementsInScrollView()
         setupStackView()
         setupTableView()
         setupConstraints()
@@ -25,6 +26,10 @@ final class NewEventViewController: UIViewController {
     private let items = [
         ("Категория", "")
     ]
+    
+    private let emojiCollectionView = EmojiCollectionView()
+    
+    private let colorsCollectionView = ColorsCollectionView()
     
     private let viewModel: TrackersViewModel
     
@@ -40,9 +45,21 @@ final class NewEventViewController: UIViewController {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.text = "Новая привычка"
+        label.text = "Новое нерегулярное событие"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private let textField: UITextField = {
@@ -121,6 +138,19 @@ final class NewEventViewController: UIViewController {
         
     }
     
+    private func setupElementsInScrollView() {
+        view.addSubview(titleLabel)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(textField)
+        contentView.addSubview(warningLabel)
+        contentView.addSubview(tableView)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorsCollectionView)
+        contentView.addSubview(buttonStackView)
+    }
+    
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -135,7 +165,7 @@ final class NewEventViewController: UIViewController {
     }
     
     private func setupStackView() {
-        view.addSubview(buttonStackView)
+//        view.addSubview(buttonStackView)
         
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
@@ -143,39 +173,62 @@ final class NewEventViewController: UIViewController {
     
     private func setupConstraints() {
         
-        view.addSubview(titleLabel)
-        view.addSubview(textField)
-        view.addSubview(warningLabel)
-        view.addSubview(tableView)
+//        view.addSubview(titleLabel)
+//        view.addSubview(textField)
+//        view.addSubview(warningLabel)
+//        view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
             
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
-            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            textField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            textField.topAnchor.constraint(equalTo: contentView.topAnchor),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 75),
             
-            warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 8),
-            warningLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -32),
+            warningLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
             
-            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 62),
+            tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 75),
             
+            emojiCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            emojiCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            
+            colorsCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            colorsCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 34),
+            colorsCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
+            colorsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
+            colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            
             createButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
-            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            buttonStackView.topAnchor.constraint(equalTo: colorsCollectionView.bottomAnchor, constant: 16),
+            buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
+            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
             
         ])
         

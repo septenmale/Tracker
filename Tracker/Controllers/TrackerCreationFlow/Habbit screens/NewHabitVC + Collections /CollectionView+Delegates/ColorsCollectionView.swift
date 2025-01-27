@@ -13,12 +13,16 @@ final class ColorsCollectionView: UICollectionView {
         UIColor.collectionColor1,UIColor.collectionColor2,UIColor.collectionColor3,UIColor.collectionColor4,UIColor.collectionColor5,UIColor.collectionColor6,UIColor.collectionColor7,UIColor.collectionColor8,UIColor.collectionColor9,UIColor.collectionColor10,UIColor.collectionColor11,UIColor.collectionColor12,UIColor.collectionColor13,UIColor.collectionColor14,UIColor.collectionColor15,UIColor.collectionColor16,UIColor.collectionColor17,UIColor.collectionColor18
     ]
     
+    private(set) var selectedColor: UIColor?
+    
     init() {
         super.init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         self.delegate = self
         self.dataSource = self
         self.isScrollEnabled = false
+        self.allowsMultipleSelection = false
+        
         self.register(ColorsCollectionCell.self, forCellWithReuseIdentifier: ColorsCollectionCell.reuseIdentifier)
         self.register(ColorsCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: ColorsCollectionHeader.reuseIdentifier)
         
@@ -60,6 +64,31 @@ extension ColorsCollectionView: UICollectionViewDataSource {
         default:
             fatalError("Unexpected supplementary element kind \(kind)")
         }
+        
+    }
+    
+}
+
+extension ColorsCollectionView: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        guard let selectedCell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionCell else { return }
+        
+        selectedCell.layer.borderWidth = 3
+        selectedCell.layer.cornerRadius = 8
+        selectedCell.layer.masksToBounds = true
+        selectedCell.layer.borderColor = colorsCollectionViewItems[indexPath.item].withAlphaComponent(0.3).cgColor
+        
+        selectedColor = colorsCollectionViewItems[indexPath.item]
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        
+        guard let selectedCell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionCell else { return }
+        
+        selectedCell.layer.borderWidth = 0
         
     }
     

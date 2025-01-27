@@ -74,6 +74,7 @@ extension EmojiCollectionView: UICollectionViewDelegate {
         selectedCell.contentView.backgroundColor = .tLightGrey
         
         selectedEmoji = emojiCollectionViewItems[indexPath.item]
+        // найти способ вызвать тут обновление состояния кнопки
         
     }
     

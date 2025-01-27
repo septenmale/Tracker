@@ -81,7 +81,7 @@ extension ColorsCollectionView: UICollectionViewDelegate {
         selectedCell.layer.borderColor = colorsCollectionViewItems[indexPath.item].withAlphaComponent(0.3).cgColor
         
         selectedColor = colorsCollectionViewItems[indexPath.item]
-        
+        // найти способ вызвать тут обновление состояния кнопки 
     }
     
     

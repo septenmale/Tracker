@@ -165,18 +165,12 @@ final class NewEventViewController: UIViewController {
     }
     
     private func setupStackView() {
-//        view.addSubview(buttonStackView)
         
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
     }
     
     private func setupConstraints() {
-        
-//        view.addSubview(titleLabel)
-//        view.addSubview(textField)
-//        view.addSubview(warningLabel)
-//        view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
             

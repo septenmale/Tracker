@@ -241,7 +241,16 @@ final class NewEventViewController: UIViewController {
             return
         }
         
-        viewModel.addTracker(title: eventName, schedule: [])
+        guard let selectedEmoji = emojiCollectionView.selectedEmoji else {
+            return
+        }
+        
+        guard let selectedColor = colorsCollectionView.selectedColor else {
+            return
+        }
+        // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
+        viewModel.addTracker(title: eventName, schedule: [], emoji: selectedEmoji, color: selectedColor)
+
         delegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)

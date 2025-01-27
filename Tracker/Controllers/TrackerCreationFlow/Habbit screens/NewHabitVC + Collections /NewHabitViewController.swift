@@ -172,7 +172,15 @@ final class NewHabitViewController: UIViewController {
             return
         }
         
-        viewModel.addTracker(title: habitName, schedule: selectedDays)
+        guard let selectedEmoji = emojiCollectionView.selectedEmoji else {
+            return
+        }
+        
+        guard let selectedColor = colorsCollectionView.selectedColor else {
+            return
+        }
+        // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
+        viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor)
         delegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)

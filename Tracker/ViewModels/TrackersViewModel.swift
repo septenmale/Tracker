@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 final class TrackersViewModel {
     
@@ -46,7 +47,7 @@ final class TrackersViewModel {
         return nil
     }
     
-    func addTracker(title: String, schedule: [Int]) {
+    func addTracker(title: String, schedule: [Int], emoji: String, color: UIColor) {
         
         let weekdays: [Weekday] = schedule.compactMap { index in
             switch index {
@@ -64,8 +65,8 @@ final class TrackersViewModel {
         let newTracker = Tracker(
             id: UUID(),
             title: title,
-            color: "green",
-            emoji: "📖",
+            color: color,
+            emoji: emoji,
             schedule: weekdays
         )
         

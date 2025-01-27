@@ -69,16 +69,19 @@ extension EmojiCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // TODO: убрать выделение для предидущего
-        let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell
-        selectedCell?.contentView.backgroundColor = .tLightGrey
+        guard let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell else { return }
+        
+        selectedCell.contentView.backgroundColor = .tLightGrey
         
         selectedEmoji = emojiCollectionViewItems[indexPath.item]
-
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell
-        selectedCell?.contentView.backgroundColor = .clear
+        guard let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell else {
+            return }
+        
+        selectedCell.contentView.backgroundColor = .clear
     }
 }
 

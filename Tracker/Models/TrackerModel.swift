@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum Weekday: String {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
@@ -14,7 +15,7 @@ enum Weekday: String {
 struct Tracker {
     let id: UUID
     let title: String
-    let color: String
+    let color: UIColor
     let emoji: String
     let schedule: [Weekday]
 }

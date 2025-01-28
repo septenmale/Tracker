@@ -7,12 +7,14 @@
 
 import UIKit
 
-final class NewHabitViewController: UIViewController {
+final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
+        emojiCollectionView.changeButtonStateDelegate = self
+        colorsCollectionView.changeButtonStateDelegate = self
         
         setupElementsInScrollView()
         setupStackView()
@@ -20,7 +22,7 @@ final class NewHabitViewController: UIViewController {
         setupConstraints()
     }
     
-    weak var delegate: NewTrackerDelegate?
+    weak var newTrackerDelegate: NewTrackerDelegate?
     
     private let viewModel: TrackersViewModel
     
@@ -145,12 +147,14 @@ final class NewHabitViewController: UIViewController {
         tableView.reloadData()
     }
     
-    private func changeCreateButtonState() {
+    func changeCreateButtonState() {
         
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
         let isScheduleValid = !selectedDays.isEmpty
+        let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
+        let isColorSelected = colorsCollectionView.selectedColor != nil
         
-        if isTextFieldValid && isScheduleValid {
+        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
@@ -181,7 +185,7 @@ final class NewHabitViewController: UIViewController {
         }
         // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
         viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor)
-        delegate?.didCreateNewTracker()
+        newTrackerDelegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)
         

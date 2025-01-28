@@ -9,6 +9,8 @@ import UIKit
 
 final class EmojiCollectionView: UICollectionView {
     
+    weak var changeButtonStateDelegate: ChangeButtonStateDelegate?
+    
     let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
     
     private(set) var selectedEmoji: String?
@@ -74,7 +76,7 @@ extension EmojiCollectionView: UICollectionViewDelegate {
         selectedCell.contentView.backgroundColor = .tLightGrey
         
         selectedEmoji = emojiCollectionViewItems[indexPath.item]
-        // найти способ вызвать тут обновление состояния кнопки
+        changeButtonStateDelegate?.changeCreateButtonState()
         
     }
     

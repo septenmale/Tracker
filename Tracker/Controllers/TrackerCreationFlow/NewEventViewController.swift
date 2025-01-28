@@ -7,12 +7,14 @@
 
 import UIKit
 
-final class NewEventViewController: UIViewController {
+final class NewEventViewController: UIViewController, ChangeButtonStateDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
+        emojiCollectionView.changeButtonStateDelegate = self
+        colorsCollectionView.changeButtonStateDelegate = self
         
         setupElementsInScrollView()
         setupStackView()
@@ -20,7 +22,7 @@ final class NewEventViewController: UIViewController {
         setupConstraints()
     }
     
-    weak var delegate: NewTrackerDelegate?
+    weak var newTrackerDelegate: NewTrackerDelegate?
     
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let items = [
@@ -124,11 +126,13 @@ final class NewEventViewController: UIViewController {
         return stackView
     }()
     
-    private func changeCreateButtonState() {
+    func changeCreateButtonState() {
         
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
+        let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
+        let isColorSelected = colorsCollectionView.selectedColor != nil
         
-        if isTextFieldValid {
+        if isTextFieldValid && isEmojiSelected && isColorSelected {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
@@ -245,7 +249,7 @@ final class NewEventViewController: UIViewController {
         // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
         viewModel.addTracker(title: eventName, schedule: [], emoji: selectedEmoji, color: selectedColor)
 
-        delegate?.didCreateNewTracker()
+        newTrackerDelegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)
     }

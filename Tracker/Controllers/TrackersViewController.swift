@@ -79,7 +79,7 @@ final class TrackersViewController: UIViewController {
     
     @objc private func addTracker() {
         let trackerTypeViewController = TrackerTypeViewController(viewModel: self.viewModel)
-        trackerTypeViewController.delegate = self
+        trackerTypeViewController.newTrackerDelegate = self
         present(trackerTypeViewController, animated: true)
     }
     // TODO: add picked date logic

@@ -9,6 +9,8 @@ import UIKit
 
 final class ColorsCollectionView: UICollectionView {
     
+    weak var changeButtonStateDelegate: ChangeButtonStateDelegate?
+    
     let colorsCollectionViewItems: [UIColor] = [
         UIColor.collectionColor1,UIColor.collectionColor2,UIColor.collectionColor3,UIColor.collectionColor4,UIColor.collectionColor5,UIColor.collectionColor6,UIColor.collectionColor7,UIColor.collectionColor8,UIColor.collectionColor9,UIColor.collectionColor10,UIColor.collectionColor11,UIColor.collectionColor12,UIColor.collectionColor13,UIColor.collectionColor14,UIColor.collectionColor15,UIColor.collectionColor16,UIColor.collectionColor17,UIColor.collectionColor18
     ]
@@ -72,7 +74,7 @@ extension ColorsCollectionView: UICollectionViewDataSource {
 extension ColorsCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        // TODO: убрать выделение для предидущего
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionCell else { return }
         
         selectedCell.layer.borderWidth = 3
@@ -81,7 +83,8 @@ extension ColorsCollectionView: UICollectionViewDelegate {
         selectedCell.layer.borderColor = colorsCollectionViewItems[indexPath.item].withAlphaComponent(0.3).cgColor
         
         selectedColor = colorsCollectionViewItems[indexPath.item]
-        // найти способ вызвать тут обновление состояния кнопки 
+        changeButtonStateDelegate?.changeCreateButtonState()
+        
     }
     
     

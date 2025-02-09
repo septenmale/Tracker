@@ -10,7 +10,6 @@ import Foundation
 import CoreData
 import UIKit
 
-
 extension TrackerCoreData {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<TrackerCoreData> {

@@ -7,7 +7,7 @@
 
 import CoreData
 import UIKit
-
+// TODO: Тут и в след двух классах добавить функции сохранения и добавления по примеру EmojiMixer
 final class TrackerCategoryStore {
     
     private let context: NSManagedObjectContext

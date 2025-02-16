@@ -1,13 +1,13 @@
 //
-//  TrackerCategoryStore.swift
+//  TrackerStore.swift
 //  Tracker
 //
 //  Created by Viktor Zavhorodnii on 05/02/2025.
 //
 
-import CoreData
 import UIKit
-// TODO: Тут и в след двух классах добавить функции сохранения и добавления по примеру EmojiMixer
+import CoreData
+
 final class TrackerCategoryStore {
     
     private let context: NSManagedObjectContext

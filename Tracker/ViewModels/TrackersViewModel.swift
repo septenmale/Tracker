@@ -11,7 +11,7 @@ import UIKit
 final class TrackersViewModel {
     
     private var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = [TrackerCategory(
+    var categories: [TrackerCategory] = [TrackerCategory( //TODO: тут обращаемся к стору
         title: "По умолчанию",
         items: [])
     ]

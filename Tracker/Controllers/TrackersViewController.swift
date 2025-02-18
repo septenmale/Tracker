@@ -7,12 +7,13 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Trackers"
+        viewModel.delegate = self
         
         addNavItems()
         setupStackView()
@@ -77,6 +78,12 @@ final class TrackersViewController: UIViewController {
         return datePicker
     }()
     
+    func didUpdateTrackers() {
+        print("📢 (didUpdateTrackers) Трекеры обновлены, обновляем UI!")
+        updateTrackers(for: Date())
+        setupUIBasedOnData()
+    }
+    
     @objc private func addTracker() {
         let trackerTypeViewController = TrackerTypeViewController(viewModel: self.viewModel)
         trackerTypeViewController.newTrackerDelegate = self
@@ -84,13 +91,23 @@ final class TrackersViewController: UIViewController {
     }
     // TODO: add picked date logic
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDate = Calendar.current.startOfDay(for: sender.date)
-        updateTrackers(for: selectedDate)
-        setupUIBasedOnData()
+        let selectedDate = sender.date
+        let correctedDate = Calendar.current.startOfDay(for: selectedDate)
+
+        print("📅 DatePicker изменён: \(selectedDate), Приведённая дата: \(correctedDate)")
+
+        updateTrackers(for: correctedDate)
     }
     
     private func updateTrackers(for date: Date) {
-        filteredTrackers = viewModel.getTrackers(for: date)
+        print("🔄 updateTrackers() вызван для даты: \(date)")
+
+        let correctedDate = Calendar.current.startOfDay(for: date)
+        print("🔄 После приведения к началу дня: \(correctedDate)")
+
+        filteredTrackers = viewModel.getTrackers(for: correctedDate)
+        print("📂 После вызова getTrackers, количество: \(filteredTrackers.count)")
+
         collectionView.reloadData()
     }
     

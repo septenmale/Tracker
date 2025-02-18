@@ -8,47 +8,82 @@
 import Foundation
 import UIKit
 
-final class TrackersViewModel {
+protocol TrackersViewModelDelegate: AnyObject {
+    func didUpdateTrackers()
+}
+
+final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegate, TrackerRecordStoreDelegate {
+
+    weak var delegate: TrackersViewModelDelegate?
     
-    private var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = [TrackerCategory( //TODO: тут обращаемся к стору
-        title: "По умолчанию",
-        items: [])
-    ]
+    private let trackerStore = TrackerStore()
+    private let categoryStore = TrackerCategoryStore()
+    private let recordStore = TrackerRecordStore()
+    
+    init() {
+        trackerStore.delegate = self
+        categoryStore.delegate = self
+        recordStore.delegate = self
+    }
+    
+    func didUpdateTrackers() {
+        print("📢 Трекеры обновились!")
+        delegate?.didUpdateTrackers()
+    }
+    
+    func didUpdateCategories() {
+        print("📢 Категории обновились!")
+        delegate?.didUpdateTrackers()
+    }
+    
+    func didUpdateRecords() {
+        print("📢 Записи о выполнении трекеров обновились!")
+        delegate?.didUpdateTrackers()
+    }
     
     func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
-        
+
         let newRecord = TrackerRecord(id: tracker.id, date: startOfDay)
+        print("📝 Добавляем запись о выполнении трекера: \(tracker.title), Дата: \(startOfDay)")
+
+        recordStore.addRecord(newRecord)
+        DispatchQueue.main.async {
+                self.delegate?.didUpdateTrackers()
+            }
         
-        completedTrackers = completedTrackers + [newRecord]
     }
     
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
-        completedTrackers.removeAll { $0.id == tracker.id && $0.date == startOfDay }
+        recordStore.deleteRecord(id: tracker.id, date: startOfDay)
     }
     
     func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {
         let startOfDay = Calendar.current.startOfDay(for: date)
-        return completedTrackers.contains(where: { $0.id == tracker.id && $0.date == startOfDay })
+        let allRecords = recordStore.fetchRecords()
+        
+        let completed = allRecords.contains { $0.id == tracker.id && $0.date == startOfDay }
+        print("🔍 Проверяем выполнение трекера: \(tracker.title), Дата: \(startOfDay) -> Выполнен? \(completed)")
+        
+        return completed
     }
     
     func getDaysAmount(_ tracker: Tracker) -> Int {
-        return completedTrackers.filter { $0.id == tracker.id }.count
+        
+        let allRecords = recordStore.fetchRecords()
+        
+        return allRecords.filter { $0.id == tracker.id }.count
     }
     
     func verifyTracker(by id: UUID) -> Tracker? {
-        for category in categories {
-            if let tracker = category.items.first(where: { $0.id == id }) {
-                return tracker
-            }
-        }
-        return nil
+        
+        let allTrackers = trackerStore.fetchTrackers()
+        
+        return allTrackers.first { $0.id == id }
     }
     
     func addTracker(title: String, schedule: [Int], emoji: String, color: UIColor) {
-        
         let weekdays: [Weekday] = schedule.compactMap { index in
             switch index {
             case 0: return .monday
@@ -61,7 +96,7 @@ final class TrackersViewModel {
             default: return nil
             }
         }
-        
+
         let newTracker = Tracker(
             id: UUID(),
             title: title,
@@ -69,39 +104,52 @@ final class TrackersViewModel {
             emoji: emoji,
             schedule: weekdays
         )
+
+        // ✅ Добавляем сам трекер в БД
+        trackerStore.addTracker(newTracker)
         
-        let defaultCategory = categories[0]
-        let updatedCategory = TrackerCategory(
-            title: defaultCategory.title,
-            items: defaultCategory.items + [newTracker]
-        )
-        
-        categories = [updatedCategory]
-        
+        print("✅ Трекер добавлен: \(newTracker.title)")
     }
     
     func getTrackers(for date: Date) -> [TrackerCategory] {
-        var filteredCategories: [TrackerCategory] = []
-        
-        let weekdayIndex = Calendar.current.component(.weekday, from: date)
-        let currentWeekday = weekdayFromIndex(weekdayIndex)
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        
-        for category in categories {
+        print("🔎 getTrackers() вызван для даты: \(date)")
+
+        let startOfDay = date
+        print("📅 Приведённая дата: \(startOfDay)")
+
+        let allCategories = categoryStore.fetchCategories()
+        print("📂 Загружено категорий: \(allCategories.count)")
+
+        let allRecords = recordStore.fetchRecords()
+        print("📜 Всего записей о выполнении: \(allRecords.count)")
+
+        let filteredCategories: [TrackerCategory] = allCategories.compactMap { category in
             let filteredItems = category.items.filter { tracker in
+                let isCompletedToday = allRecords.contains { $0.id == tracker.id && $0.date == startOfDay }
+                let hasRecord = allRecords.contains { $0.id == tracker.id }
+
+                let isScheduled: Bool
                 if tracker.schedule.isEmpty {
-                    return !completedTrackers.contains { $0.id == tracker.id } ||
-                    completedTrackers.contains { $0.id == tracker.id && $0.date == startOfDay }
+                    // Для нерегулярных трекеров
+                    isScheduled = !hasRecord || isCompletedToday
                 } else {
-                    return tracker.schedule.contains(currentWeekday)
+                    // Для регулярных трекеров
+                    isScheduled = tracker.schedule.contains(weekdayFromIndex(Calendar.current.component(.weekday, from: date))) || isCompletedToday
                 }
+
+                print("🔍 Проверяем трекер: \(tracker.title)")
+                print("   📆 Дата: \(date)")
+                print("   ✅ Записан ли он как выполненный? \(isCompletedToday)")
+                print("   📅 Должен ли отображаться? \(isScheduled)")
+
+                return isScheduled
             }
-            
-            if !filteredItems.isEmpty {
-                filteredCategories.append(TrackerCategory(title: category.title, items: filteredItems))
-            }
+
+            print("📂 Категория: \(category.title), Кол-во отфильтрованных трекеров: \(filteredItems.count)")
+            return filteredItems.isEmpty ? nil : TrackerCategory(title: category.title, items: filteredItems)
         }
-        
+
+        print("📂 Всего отфильтровано: \(filteredCategories.count)")
         return filteredCategories
     }
     

@@ -39,7 +39,12 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
-        try? fetchedResultsController.performFetch()
+        do {
+               try fetchedResultsController.performFetch()
+               print("✅ (init) NSFetchedResultsController загружен успешно!")
+           } catch {
+               print("❌ (init) Ошибка загрузки FRC: \(error.localizedDescription)")
+           }
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -47,14 +52,25 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     }
     
     func fetchRecords() -> [TrackerRecord] {
-        guard let fetchedObjects = fetchedResultsController.fetchedObjects else { return [] }
-        
+        print("🔎 fetchRecords() вызван")
+
+        guard let fetchedObjects = fetchedResultsController.fetchedObjects else {
+            print("📜 fetchRecords(): FRC не загрузил объекты, возвращаем пустой массив.")
+            return []
+        }
+
         return fetchedObjects.compactMap { coreDataObject in
             guard let id = coreDataObject.id,
                   let date = coreDataObject.date
-            else { return nil }
-            
-            return TrackerRecord(id: id, date: date)
+            else {
+                print("⚠️ fetchRecords(): Ошибка! Одна из записей в Core Data имеет nil значения.")
+                return nil
+            }
+
+            let localDate = Calendar.current.startOfDay(for: date) // ✅ Приводим дату к началу дня в локальном времени
+            print("✅ fetchRecords(): Загружена запись -> ID: \(id), Дата в Core Data: \(date), Локальная дата: \(localDate)")
+
+            return TrackerRecord(id: id, date: localDate) // ✅ Сохраняем локальную дату
         }
     }
     
@@ -64,6 +80,19 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         recordToBeSaved.date = record.date
         
         saveContext()
+    }
+    
+    func deleteRecord(id: UUID, date: Date) {
+        let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        fetchRequest.predicate = NSPredicate(format: "id == %@ AND date == %@", id as CVarArg, date as CVarArg)
+
+        do {
+            let recordsToDelete = try context.fetch(fetchRequest)
+            recordsToDelete.forEach { context.delete($0) }
+            saveContext()
+        } catch {
+            print("❌ Ошибка удаления записи: \(error)")
+        }
     }
     
     private func saveContext() {

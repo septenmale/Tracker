@@ -19,7 +19,7 @@ extension TrackerCoreData {
     @NSManaged public var color: UIColor?
     @NSManaged public var emoji: String?
     @NSManaged public var id: UUID?
-    @NSManaged public var schedule: NSObject?
+    @NSManaged public var schedule: Data?
     @NSManaged public var title: String?
     @NSManaged public var category: TrackerCategoryCoreData?
     @NSManaged public var record: NSSet?

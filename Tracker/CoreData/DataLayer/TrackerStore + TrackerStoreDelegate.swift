@@ -14,7 +14,7 @@ protocol TrackerStoreDelegate: AnyObject {
 
 final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
-    weak var trackerStoreDelegate: TrackerStoreDelegate?
+    weak var delegate: TrackerStoreDelegate?
     private let context: NSManagedObjectContext
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
@@ -39,15 +39,24 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
-        try? fetchedResultsController.performFetch()
+        do {
+               try fetchedResultsController.performFetch()
+               print("✅ (init) NSFetchedResultsController загружен успешно!")
+           } catch {
+               print("❌ (init) Ошибка загрузки FRC: \(error.localizedDescription)")
+           }
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        trackerStoreDelegate?.didUpdateTrackers()
+        delegate?.didUpdateTrackers()
     }
     
     func fetchTrackers() -> [Tracker] {
-        guard let fetchedObjects = fetchedResultsController.fetchedObjects else { return [] }
+        guard let fetchedObjects = fetchedResultsController.fetchedObjects else {
+              print("❌ (fetchTrackers) Ошибка: нет объектов в FRC!")
+              return []
+          }
+        print("🛠 (fetchTrackers) Загружено трекеров из Core Data: \(fetchedObjects.count)")
         return fetchedObjects.compactMap { coreDataObject in
             guard let id = coreDataObject.id,
                   let title = coreDataObject.title,
@@ -55,21 +64,50 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
                   let emoji = coreDataObject.emoji,
                   let scheduleData = coreDataObject.schedule as? Data,
                   let schedule = try? JSONDecoder().decode([Weekday].self, from: scheduleData)
-            else { return nil }
-            
+            else {
+                print("⚠️ (fetchTrackers) Пропущен трекер из-за ошибки декодирования")
+                return nil
+            }
+            print("🛠 (fetchTrackers) Итоговое количество трекеров: \(fetchedObjects.count)")
             return Tracker(id: id, title: title, color: color, emoji: emoji, schedule: schedule)
         }
     }
     
     func addTracker(_ tracker: Tracker) {
-        let trackerToBeSaved = TrackerCoreData(context: context)
-        trackerToBeSaved.id = tracker.id
-        trackerToBeSaved.title = tracker.title
-        trackerToBeSaved.color = tracker.color
-        trackerToBeSaved.emoji = tracker.emoji
-        trackerToBeSaved.schedule = try? JSONEncoder().encode(tracker.schedule) as NSObject
-        
-        saveContext()
+        let fetchRequest = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+        fetchRequest.predicate = NSPredicate(format: "title == %@", "По умолчанию")
+
+        do {
+            let fetchedCategories = try context.fetch(fetchRequest)
+
+            let category: TrackerCategoryCoreData
+            if let existingCategory = fetchedCategories.first {
+                category = existingCategory
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = "По умолчанию"
+                category = newCategory
+            }
+
+            let trackerToBeSaved = TrackerCoreData(context: context)
+            trackerToBeSaved.id = tracker.id
+            trackerToBeSaved.title = tracker.title
+            trackerToBeSaved.color = tracker.color
+            trackerToBeSaved.emoji = tracker.emoji
+            trackerToBeSaved.schedule = try? JSONEncoder().encode(tracker.schedule) // ✅ Исправили тип данных
+            
+            trackerToBeSaved.category = category // ✅ Привязываем категорию
+
+            print("🛠 Добавляем трекер '\(tracker.title)' в категорию '\(category.title ?? "Неизвестно")'")
+            
+            category.trackers = (category.trackers as? Set<TrackerCoreData> ?? []).union([trackerToBeSaved]) as NSSet
+            
+            saveContext()
+            print("✅ Трекер '\(tracker.title)' успешно сохранён!")
+
+        } catch {
+            print("❌ Ошибка при добавлении трекера: \(error.localizedDescription)")
+        }
     }
     
     private func saveContext() {

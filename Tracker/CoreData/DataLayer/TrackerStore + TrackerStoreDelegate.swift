@@ -53,22 +53,27 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
     func fetchTrackers() -> [Tracker] {
         guard let fetchedObjects = fetchedResultsController.fetchedObjects else {
-              print("❌ (fetchTrackers) Ошибка: нет объектов в FRC!")
-              return []
-          }
+            print("❌ (fetchTrackers) Ошибка: нет объектов в FRC!")
+            return []
+        }
+        
         print("🛠 (fetchTrackers) Загружено трекеров из Core Data: \(fetchedObjects.count)")
+
         return fetchedObjects.compactMap { coreDataObject in
             guard let id = coreDataObject.id,
                   let title = coreDataObject.title,
                   let color = coreDataObject.color,
-                  let emoji = coreDataObject.emoji,
-                  let scheduleData = coreDataObject.schedule as? Data,
-                  let schedule = try? JSONDecoder().decode([Weekday].self, from: scheduleData)
+                  let emoji = coreDataObject.emoji
             else {
-                print("⚠️ (fetchTrackers) Пропущен трекер из-за ошибки декодирования")
+                print("⚠️ (fetchTrackers) Пропущен трекер из-за отсутствия обязательных данных")
                 return nil
             }
-            print("🛠 (fetchTrackers) Итоговое количество трекеров: \(fetchedObjects.count)")
+
+            let scheduleData = coreDataObject.schedule as? Data ?? Data()
+            let schedule = (try? JSONDecoder().decode([Weekday].self, from: scheduleData)) ?? []
+
+            print("✅ (fetchTrackers) Загружен трекер: \(title), ID: \(id), Расписание: \(schedule)")
+
             return Tracker(id: id, title: title, color: color, emoji: emoji, schedule: schedule)
         }
     }
@@ -94,9 +99,11 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
             trackerToBeSaved.title = tracker.title
             trackerToBeSaved.color = tracker.color
             trackerToBeSaved.emoji = tracker.emoji
-            trackerToBeSaved.schedule = try? JSONEncoder().encode(tracker.schedule) // ✅ Исправили тип данных
             
-            trackerToBeSaved.category = category // ✅ Привязываем категорию
+            // ✅ Гарантируем, что schedule всегда сохранится как []
+            trackerToBeSaved.schedule = try? JSONEncoder().encode(tracker.schedule.isEmpty ? [] : tracker.schedule)
+            
+            trackerToBeSaved.category = category // ✅ Привязываем к категории
 
             print("🛠 Добавляем трекер '\(tracker.title)' в категорию '\(category.title ?? "Неизвестно")'")
             

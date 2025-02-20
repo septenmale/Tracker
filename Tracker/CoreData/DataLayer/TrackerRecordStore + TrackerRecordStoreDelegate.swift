@@ -60,25 +60,37 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
 
         return fetchedObjects.compactMap { coreDataObject in
-            guard let id = coreDataObject.id,
-                  let date = coreDataObject.date
+            guard let date = coreDataObject.date,
+                  let tracker = (coreDataObject.trackers as? Set<TrackerCoreData>)?.first
             else {
                 print("⚠️ fetchRecords(): Ошибка! Одна из записей в Core Data имеет nil значения.")
                 return nil
             }
 
-            let localDate = Calendar.current.startOfDay(for: date) // ✅ Приводим дату к началу дня в локальном времени
-            print("✅ fetchRecords(): Загружена запись -> ID: \(id), Дата в Core Data: \(date), Локальная дата: \(localDate)")
-
-            return TrackerRecord(id: id, date: localDate) // ✅ Сохраняем локальную дату
+            print("✅ fetchRecords(): Загружена запись -> Tracker ID: \(tracker.id ?? UUID()), Дата: \(date)")
+            return TrackerRecord(id: tracker.id ?? UUID(), date: date)
         }
     }
     
     func addRecord(_ record: TrackerRecord) {
         let recordToBeSaved = TrackerRecordCoreData(context: context)
-        recordToBeSaved.id = record.id
+
+        recordToBeSaved.id = UUID()
         recordToBeSaved.date = record.date
-        
+
+        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        fetchRequest.predicate = NSPredicate(format: "id == %@", record.id as CVarArg)
+
+        do {
+            if let existingTracker = try context.fetch(fetchRequest).first {
+                recordToBeSaved.trackers = NSSet(object: existingTracker)
+            } else {
+                print("⚠️ Ошибка: Не найден трекер с id \(record.id)")
+            }
+        } catch {
+            print("❌ Ошибка при поиске трекера: \(error.localizedDescription)")
+        }
+
         saveContext()
     }
     

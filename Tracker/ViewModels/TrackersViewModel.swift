@@ -105,7 +105,7 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
             schedule: weekdays
         )
 
-        // ✅ Добавляем сам трекер в БД
+        // Добавляем сам трекер в БД
         trackerStore.addTracker(newTracker)
         
         print("✅ Трекер добавлен: \(newTracker.title)")
@@ -113,19 +113,17 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
     
     func getTrackers(for date: Date) -> [TrackerCategory] {
         print("🔎 getTrackers() вызван для даты: \(date)")
-
-        let startOfDay = date
-        print("📅 Приведённая дата: \(startOfDay)")
-
+        
         let allCategories = categoryStore.fetchCategories()
         print("📂 Загружено категорий: \(allCategories.count)")
-
+        
         let allRecords = recordStore.fetchRecords()
         print("📜 Всего записей о выполнении: \(allRecords.count)")
-
+        
         let filteredCategories: [TrackerCategory] = allCategories.compactMap { category in
             let filteredItems = category.items.filter { tracker in
-                let isCompletedToday = allRecords.contains { $0.id == tracker.id && $0.date == startOfDay }
+                
+                let isCompletedToday = allRecords.contains { $0.date == date && $0.id == tracker.id }
                 let hasRecord = allRecords.contains { $0.id == tracker.id }
 
                 let isScheduled: Bool
@@ -145,7 +143,6 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
                 return isScheduled
             }
 
-            print("📂 Категория: \(category.title), Кол-во отфильтрованных трекеров: \(filteredItems.count)")
             return filteredItems.isEmpty ? nil : TrackerCategory(title: category.title, items: filteredItems)
         }
 

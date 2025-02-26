@@ -13,7 +13,7 @@ protocol TrackersViewModelDelegate: AnyObject {
 }
 
 final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegate, TrackerRecordStoreDelegate {
-
+    
     weak var delegate: TrackersViewModelDelegate?
     
     private let trackerStore = TrackerStore()
@@ -26,61 +26,118 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
         recordStore.delegate = self
     }
     
+    // MARK: - Делегатные методы для обновления UI
+    
     func didUpdateTrackers() {
-        print("📢 Трекеры обновились!")
         delegate?.didUpdateTrackers()
     }
     
     func didUpdateCategories() {
-        print("📢 Категории обновились!")
         delegate?.didUpdateTrackers()
     }
     
     func didUpdateRecords() {
-        print("📢 Записи о выполнении трекеров обновились!")
         delegate?.didUpdateTrackers()
     }
     
-    func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
+    func getTrackers(for date: Date) -> [TrackerCategory] {
+        // Обновляем выборку записей для выбранной даты
+        recordStore.updateFetchRequest(for: date)
         let startOfDay = Calendar.current.startOfDay(for: date)
-
-        let newRecord = TrackerRecord(id: tracker.id, date: startOfDay)
-        print("📝 Добавляем запись о выполнении трекера: \(tracker.title), Дата: \(startOfDay)")
-
+        
+        // Получаем записи (TrackerRecordCoreData) для выбранной даты
+        guard let recordsForDate = recordStore.fetchedResultsController.fetchedObjects else {
+            print("⚠️ Нет записей для даты \(date)")
+            return []
+        }
+        
+        // Собираем идентификаторы трекеров, которые отмечены именно на выбранную дату
+        let completedIDsForDate = recordsForDate.compactMap { record in
+            return record.trackers?.id
+        }
+        
+        // Получаем все трекеры из хранилища
+        let allTrackers = trackerStore.fetchTrackers()
+        
+        // Определяем день недели для выбранной даты (например, .monday, .tuesday, …)
+        let dayOfWeek = weekdayFromDate(date)
+        
+        // Фильтруем трекеры по следующей логике:
+        // Для нерегулярных событий (если schedule пустой):
+        //   - Если событие никогда не отмечалось (общий счёт == 0), показываем его во все дни.
+        //   - Если событие уже отмечалось, показываем его только, если оно отмечено на выбранную дату.
+        // Для привычек (если schedule не пустой):
+        //   - Показываем трекер только, если выбранный день содержится в его расписании.
+        let filteredTrackers = allTrackers.filter { tracker in
+            if tracker.schedule.isEmpty {
+                let totalCompletionCount = recordStore.getDaysAmount(for: tracker.id)
+                let isCompletedToday = completedIDsForDate.contains(tracker.id)
+                if totalCompletionCount == 0 {
+                    // Никогда не отмечался – показываем во все дни
+                    return true
+                } else {
+                    // Уже отмечался – показываем только если сегодня отмечен
+                    return isCompletedToday
+                }
+            } else {
+                return tracker.schedule.contains(dayOfWeek)
+            }
+        }
+        
+        // Если после фильтрации нет трекеров, возвращаем пустой массив, чтобы UI показал заглушку
+        if filteredTrackers.isEmpty {
+            return []
+        }
+        
+        let defaultCategory = TrackerCategory(title: "По умолчанию", items: filteredTrackers)
+        return [defaultCategory]
+    }
+    
+    // Вспомогательный метод для определения дня недели из даты
+    private func weekdayFromDate(_ date: Date) -> Weekday {
+        let idx = Calendar.current.component(.weekday, from: date)
+        switch idx {
+        case 1: return .sunday
+        case 2: return .monday
+        case 3: return .tuesday
+        case 4: return .wednesday
+        case 5: return .thursday
+        case 6: return .friday
+        case 7: return .saturday
+        default: return .monday
+        }
+    }
+    
+    // MARK: - Методы отметки выполнения трекера
+    
+    func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
+        let day = Calendar.current.startOfDay(for: date)
+        let newRecord = TrackerRecord(id: tracker.id, date: day)
+        print("📝 Отмечаем '\(tracker.title)' выполненным на \(day)")
         recordStore.addRecord(newRecord)
         DispatchQueue.main.async {
-                self.delegate?.didUpdateTrackers()
-            }
-        
+            self.delegate?.didUpdateTrackers()
+        }
     }
     
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        recordStore.deleteRecord(id: tracker.id, date: startOfDay)
+        let day = Calendar.current.startOfDay(for: date)
+        print("🔄 Снимаем отметку с '\(tracker.title)' на \(day)")
+        recordStore.deleteRecord(id: tracker.id, date: day)
+        DispatchQueue.main.async {
+            self.delegate?.didUpdateTrackers()
+        }
     }
     
     func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        let allRecords = recordStore.fetchRecords()
-        
-        let completed = allRecords.contains { $0.id == tracker.id && $0.date == startOfDay }
-        print("🔍 Проверяем выполнение трекера: \(tracker.title), Дата: \(startOfDay) -> Выполнен? \(completed)")
-        
-        return completed
-    }
-    
-    func getDaysAmount(_ tracker: Tracker) -> Int {
-        
-        let allRecords = recordStore.fetchRecords()
-        
-        return allRecords.filter { $0.id == tracker.id }.count
-    }
-    
-    func verifyTracker(by id: UUID) -> Tracker? {
-        
-        let allTrackers = trackerStore.fetchTrackers()
-        
-        return allTrackers.first { $0.id == id }
+        // Обновляем выборку для заданной даты
+        recordStore.updateFetchRequest(for: date)
+        // Получаем записи для выбранной даты
+        guard let records = recordStore.fetchedResultsController.fetchedObjects else {
+            return false
+        }
+        // Если хотя бы одна запись связана с данным трекером, считаем его выполненным
+        return records.contains { $0.trackers?.id == tracker.id }
     }
     
     func addTracker(title: String, schedule: [Int], emoji: String, color: UIColor) {
@@ -96,71 +153,19 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
             default: return nil
             }
         }
-
-        let newTracker = Tracker(
-            id: UUID(),
-            title: title,
-            color: color,
-            emoji: emoji,
-            schedule: weekdays
-        )
-
-        // Добавляем сам трекер в БД
+        let newTracker = Tracker(id: UUID(), title: title, color: color, emoji: emoji, schedule: weekdays)
         trackerStore.addTracker(newTracker)
-        
-        print("✅ Трекер добавлен: \(newTracker.title)")
     }
     
-    func getTrackers(for date: Date) -> [TrackerCategory] {
-        print("🔎 getTrackers() вызван для даты: \(date)")
-        
-        let allCategories = categoryStore.fetchCategories()
-        print("📂 Загружено категорий: \(allCategories.count)")
-        
-        let allRecords = recordStore.fetchRecords()
-        print("📜 Всего записей о выполнении: \(allRecords.count)")
-        
-        let filteredCategories: [TrackerCategory] = allCategories.compactMap { category in
-            let filteredItems = category.items.filter { tracker in
-                
-                let isCompletedToday = allRecords.contains { $0.date == date && $0.id == tracker.id }
-                let hasRecord = allRecords.contains { $0.id == tracker.id }
-
-                let isScheduled: Bool
-                if tracker.schedule.isEmpty {
-                    // Для нерегулярных трекеров
-                    isScheduled = !hasRecord || isCompletedToday
-                } else {
-                    // Для регулярных трекеров
-                    isScheduled = tracker.schedule.contains(weekdayFromIndex(Calendar.current.component(.weekday, from: date))) || isCompletedToday
-                }
-
-                print("🔍 Проверяем трекер: \(tracker.title)")
-                print("   📆 Дата: \(date)")
-                print("   ✅ Записан ли он как выполненный? \(isCompletedToday)")
-                print("   📅 Должен ли отображаться? \(isScheduled)")
-
-                return isScheduled
-            }
-
-            return filteredItems.isEmpty ? nil : TrackerCategory(title: category.title, items: filteredItems)
-        }
-
-        print("📂 Всего отфильтровано: \(filteredCategories.count)")
-        return filteredCategories
+    // MARK: - Получение количества дней, когда трекер был выполнен
+    //
+    // Вся логика получения количества дней теперь инкапсулирована в TrackerRecordStore.
+    func getDaysAmount(_ tracker: Tracker) -> Int {
+        return recordStore.getDaysAmount(for: tracker.id)
     }
     
-    private func weekdayFromIndex(_ index: Int) -> Weekday {
-        switch index {
-        case 1: return .sunday
-        case 2: return .monday
-        case 3: return .tuesday
-        case 4: return .wednesday
-        case 5: return .thursday
-        case 6: return .friday
-        case 7: return .saturday
-        default: return .monday
-        }
+    // Дополнительный метод для проверки существования трекера по id
+    func verifyTracker(by id: UUID) -> Tracker? {
+        return trackerStore.fetchTrackers().first { $0.id == id }
     }
-    
 }

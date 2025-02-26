@@ -9,6 +9,8 @@ import UIKit
 
 final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
     
+    private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -20,7 +22,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         setUpCollectionView()
         setupConstraints()
         
-        updateTrackers(for: Date())
+        updateTrackers(for: selectedDate)
         setupUIBasedOnData()
     }
     
@@ -63,7 +65,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         return stackView
     }()
     
-   lazy private var plusButton: UIButton = {
+    lazy private var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "AddNewTrackerButton"), for: .normal)
         button.addTarget(self, action: #selector(addTracker), for: .touchUpInside)
@@ -80,7 +82,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     
     func didUpdateTrackers() {
         print("📢 (didUpdateTrackers) Трекеры обновлены, обновляем UI!")
-        updateTrackers(for: Date())
+        updateTrackers(for: selectedDate)
         setupUIBasedOnData()
     }
     
@@ -91,23 +93,17 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     // TODO: add picked date logic
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDate = sender.date
-        let correctedDate = Calendar.current.startOfDay(for: selectedDate)
-
-        print("📅 DatePicker изменён: \(selectedDate), Приведённая дата: \(correctedDate)")
-
-        updateTrackers(for: correctedDate)
+        let chosenDate = sender.date
+        // Обновляем выбранную дату
+        selectedDate = Calendar.current.startOfDay(for: chosenDate)
+        print("📅 DatePicker изменён: \(sender.date) -> \(selectedDate)")
+        updateTrackers(for: selectedDate)
     }
     
     private func updateTrackers(for date: Date) {
         print("🔄 updateTrackers() вызван для даты: \(date)")
-
-        let correctedDate = Calendar.current.startOfDay(for: date)
-        print("🔄 После приведения к началу дня: \(correctedDate)")
-
-        filteredTrackers = viewModel.getTrackers(for: correctedDate)
+        filteredTrackers = viewModel.getTrackers(for: date)
         print("📂 После вызова getTrackers, количество: \(filteredTrackers.count)")
-
         collectionView.reloadData()
     }
     

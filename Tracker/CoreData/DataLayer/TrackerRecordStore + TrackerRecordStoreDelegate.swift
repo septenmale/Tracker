@@ -17,20 +17,21 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     weak var delegate: TrackerRecordStoreDelegate?
     private let context: NSManagedObjectContext
     
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
-        let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+    // NSFetchedResultsController для работы с TrackerRecordCoreData
+    lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        // Сортировка по дате
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-        
-        let frc = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
+        // Изначально предикат может быть nil – будем обновлять через метод updateFetchRequest(for:)
+        let frc = NSFetchedResultsController(fetchRequest: fetchRequest,
+                                             managedObjectContext: context,
+                                             sectionNameKeyPath: nil,
+                                             cacheName: nil)
         frc.delegate = self
         return frc
     }()
     
+    // Конструкторы
     convenience override init() {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.init(context: context)
@@ -40,72 +41,83 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         self.context = context
         super.init()
         do {
-               try fetchedResultsController.performFetch()
-               print("✅ (init) NSFetchedResultsController загружен успешно!")
-           } catch {
-               print("❌ (init) Ошибка загрузки FRC: \(error.localizedDescription)")
-           }
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.didUpdateRecords()
-    }
-    
-    func fetchRecords() -> [TrackerRecord] {
-        print("🔎 fetchRecords() вызван")
-
-        guard let fetchedObjects = fetchedResultsController.fetchedObjects else {
-            print("📜 fetchRecords(): FRC не загрузил объекты, возвращаем пустой массив.")
-            return []
-        }
-
-        return fetchedObjects.compactMap { coreDataObject in
-            guard let date = coreDataObject.date,
-                  let tracker = (coreDataObject.trackers as? Set<TrackerCoreData>)?.first
-            else {
-                print("⚠️ fetchRecords(): Ошибка! Одна из записей в Core Data имеет nil значения.")
-                return nil
-            }
-
-            print("✅ fetchRecords(): Загружена запись -> Tracker ID: \(tracker.id ?? UUID()), Дата: \(date)")
-            return TrackerRecord(id: tracker.id ?? UUID(), date: date)
+            try fetchedResultsController.performFetch()
+            print("✅ FRC успешно загружен при инициализации!")
+        } catch {
+            print("❌ Ошибка загрузки FRC: \(error.localizedDescription)")
         }
     }
     
-    func addRecord(_ record: TrackerRecord) {
-        let recordToBeSaved = TrackerRecordCoreData(context: context)
-
-        recordToBeSaved.id = UUID()
-        recordToBeSaved.date = record.date
-
-        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        fetchRequest.predicate = NSPredicate(format: "id == %@", record.id as CVarArg)
-
+    // MARK: - Обновление выборки по дате
+    
+    /// Обновляет предикат выборки FRC для выбранной даты
+    func updateFetchRequest(for date: Date) {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let predicate = NSPredicate(format: "date == %@", startOfDay as NSDate)
+        fetchedResultsController.fetchRequest.predicate = predicate
         do {
-            if let existingTracker = try context.fetch(fetchRequest).first {
-                recordToBeSaved.trackers = NSSet(object: existingTracker)
+            try fetchedResultsController.performFetch()
+            print("✅ FRC обновлен для даты: \(startOfDay)")
+        } catch {
+            print("❌ Ошибка обновления FRC: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Методы для добавления и удаления записей
+    
+    /// Добавляет новую запись для трекера
+    func addRecord(_ record: TrackerRecord) {
+        // Создаем новую запись TrackerRecordCoreData
+        let recordToBeSaved = TrackerRecordCoreData(context: context)
+        recordToBeSaved.id = UUID()  // Или record.id, если требуется сохранять оригинальный id
+        recordToBeSaved.date = Calendar.current.startOfDay(for: record.date)
+        
+        // Находим соответствующий TrackerCoreData по record.id
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", record.id as CVarArg)
+        
+        do {
+            if let tracker = try context.fetch(fetchRequest).first {
+                // Устанавливаем связь (так как связь теперь "to one")
+                recordToBeSaved.trackers = tracker
             } else {
-                print("⚠️ Ошибка: Не найден трекер с id \(record.id)")
+                print("⚠️ Не найден трекер с id \(record.id)")
             }
         } catch {
             print("❌ Ошибка при поиске трекера: \(error.localizedDescription)")
         }
-
+        
         saveContext()
     }
     
+    /// Удаляет запись для трекера по id и дате
     func deleteRecord(id: UUID, date: Date) {
-        let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-        fetchRequest.predicate = NSPredicate(format: "id == %@ AND date == %@", id as CVarArg, date as CVarArg)
-
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@ AND date == %@", id as CVarArg, startOfDay as NSDate)
+        
         do {
             let recordsToDelete = try context.fetch(fetchRequest)
             recordsToDelete.forEach { context.delete($0) }
             saveContext()
         } catch {
-            print("❌ Ошибка удаления записи: \(error)")
+            print("❌ Ошибка удаления записи: \(error.localizedDescription)")
         }
     }
+    
+    func getDaysAmount(for trackerID: UUID) -> Int {
+            let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "trackers.id == %@", trackerID as CVarArg)
+            do {
+                let records = try context.fetch(fetchRequest)
+                return records.count
+            } catch {
+                print("❌ Ошибка получения количества дней для трекера: \(error.localizedDescription)")
+                return 0
+            }
+        }
+    
+    // MARK: - Сохранение контекста
     
     private func saveContext() {
         if context.hasChanges {
@@ -118,4 +130,10 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
+    // MARK: - NSFetchedResultsControllerDelegate
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        // Уведомляем делегата, что данные обновились (например, чтобы обновить UI)
+        delegate?.didUpdateRecords()
+    }
 }

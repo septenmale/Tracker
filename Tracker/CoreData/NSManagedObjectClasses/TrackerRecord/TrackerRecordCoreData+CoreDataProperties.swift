@@ -18,7 +18,7 @@ extension TrackerRecordCoreData {
 
     @NSManaged public var date: Date?
     @NSManaged public var id: UUID?
-    @NSManaged public var trackers: NSSet?
+    @NSManaged public var trackers: TrackerCoreData?
 
 }
 

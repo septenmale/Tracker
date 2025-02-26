@@ -23,7 +23,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         setupConstraints()
         
         updateTrackers(for: selectedDate)
-        setupUIBasedOnData()
+        //        setupUIBasedOnData()
     }
     
     let viewModel = TrackersViewModel()
@@ -83,7 +83,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     func didUpdateTrackers() {
         print("📢 (didUpdateTrackers) Трекеры обновлены, обновляем UI!")
         updateTrackers(for: selectedDate)
-        setupUIBasedOnData()
+        //        setupUIBasedOnData()
     }
     
     @objc private func addTracker() {
@@ -105,6 +105,8 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         filteredTrackers = viewModel.getTrackers(for: date)
         print("📂 После вызова getTrackers, количество: \(filteredTrackers.count)")
         collectionView.reloadData()
+        setupUIBasedOnData()
+        
     }
     
     private func addNavItems() {
@@ -164,10 +166,10 @@ extension TrackersViewController: UISearchResultsUpdating {
         
     }
 }
-
+// TODO: похоже на дубль делегатом. Проверить так же TrackersViewModelDelegate второй скорее всего лишний
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateNewTracker() {
-        updateTrackers(for: Date())
+        updateTrackers(for: selectedDate)
         setupUIBasedOnData()
     }
 }

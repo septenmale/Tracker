@@ -123,6 +123,7 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
         let day = Calendar.current.startOfDay(for: date)
         print("🔄 Снимаем отметку с '\(tracker.title)' на \(day)")
+        // Передаем идентификатор трекера, чтобы удалить запись, связанную с этим трекером на выбранную дату
         recordStore.deleteRecord(id: tracker.id, date: day)
         DispatchQueue.main.async {
             self.delegate?.didUpdateTrackers()

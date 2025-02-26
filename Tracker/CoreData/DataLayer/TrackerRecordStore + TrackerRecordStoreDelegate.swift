@@ -91,10 +91,11 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     }
     
     /// Удаляет запись для трекера по id и дате
-    func deleteRecord(id: UUID, date: Date) {
+    func deleteRecord(id trackerID: UUID, date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@ AND date == %@", id as CVarArg, startOfDay as NSDate)
+        // Используем tracker's id для поиска записи
+        fetchRequest.predicate = NSPredicate(format: "trackers.id == %@ AND date == %@", trackerID as CVarArg, startOfDay as NSDate)
         
         do {
             let recordsToDelete = try context.fetch(fetchRequest)

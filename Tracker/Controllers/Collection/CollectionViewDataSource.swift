@@ -51,22 +51,26 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         return cell
     }
-    //TODO: Refractor
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                             withReuseIdentifier: CollectionHeader.reuseIdentifier,
-                                                                             for: indexPath
-            ) as! CollectionHeader
-            
-            headerView.titleLabel.text = filteredTrackers[indexPath.section].title
-            return headerView
-            
-        default:
-            fatalError("Unexpected supplementary element kind \(kind)")
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            assertionFailure("Unexpected element kind \(kind)")
+            return UICollectionReusableView()
         }
+        
+        guard  let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: CollectionHeader.reuseIdentifier,
+            for: indexPath
+        ) as? CollectionHeader else {
+            assertionFailure("Failed to dequeue ColorsCollectionHeader")
+            return UICollectionReusableView()
+        }
+        
+        headerView.titleLabel.text = filteredTrackers[indexPath.section].title
+        return headerView
+        
     }
     
 }

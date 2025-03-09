@@ -17,12 +17,11 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     weak var delegate: TrackerRecordStoreDelegate?
     private let context: NSManagedObjectContext
     
-    // NSFetchedResultsController для работы с TrackerRecordCoreData
     lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        // Сортировка по дате
+        
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-        // Изначально предикат может быть nil – будем обновлять через метод updateFetchRequest(for:)
+        
         let frc = NSFetchedResultsController(fetchRequest: fetchRequest,
                                              managedObjectContext: context,
                                              sectionNameKeyPath: nil,
@@ -31,9 +30,9 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         return frc
     }()
     
-    // Конструкторы
+    
     convenience override init() {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let context = CoreDataManager.shared.context
         self.init(context: context)
     }
     
@@ -87,7 +86,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
             print("❌ Ошибка при поиске трекера: \(error.localizedDescription)")
         }
         
-        saveContext()
+        CoreDataManager.shared.saveContext()
     }
     
     /// Удаляет запись для трекера по id и дате
@@ -100,34 +99,21 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         do {
             let recordsToDelete = try context.fetch(fetchRequest)
             recordsToDelete.forEach { context.delete($0) }
-            saveContext()
+            CoreDataManager.shared.saveContext()
         } catch {
             print("❌ Ошибка удаления записи: \(error.localizedDescription)")
         }
     }
     
     func getDaysAmount(for trackerID: UUID) -> Int {
-            let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "trackers.id == %@", trackerID as CVarArg)
-            do {
-                let records = try context.fetch(fetchRequest)
-                return records.count
-            } catch {
-                print("❌ Ошибка получения количества дней для трекера: \(error.localizedDescription)")
-                return 0
-            }
-        }
-    
-    // MARK: - Сохранение контекста
-    
-    private func saveContext() {
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                context.rollback()
-                print("❌ Ошибка сохранения в Core Data: \(error.localizedDescription)")
-            }
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "trackers.id == %@", trackerID as CVarArg)
+        do {
+            let records = try context.fetch(fetchRequest)
+            return records.count
+        } catch {
+            print("❌ Ошибка получения количества дней для трекера: \(error.localizedDescription)")
+            return 0
         }
     }
     
@@ -137,4 +123,5 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         // Уведомляем делегата, что данные обновились (например, чтобы обновить UI)
         delegate?.didUpdateRecords()
     }
+    
 }

@@ -5,7 +5,6 @@
 //  Created by Viktor on 30/12/2024.
 //
 
-import Foundation
 import UIKit
 
 protocol TrackersViewModelDelegate: AnyObject {
@@ -43,7 +42,7 @@ final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegat
     func getTrackers(for date: Date) -> [TrackerCategory] {
         // Обновляем выборку записей для выбранной даты
         recordStore.updateFetchRequest(for: date)
-        let startOfDay = Calendar.current.startOfDay(for: date)
+//        let startOfDay = Calendar.current.startOfDay(for: date)
         
         // Получаем записи (TrackerRecordCoreData) для выбранной даты
         guard let recordsForDate = recordStore.fetchedResultsController.fetchedObjects else {

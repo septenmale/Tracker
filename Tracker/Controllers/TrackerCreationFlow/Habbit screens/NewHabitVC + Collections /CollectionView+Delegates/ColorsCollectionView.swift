@@ -40,7 +40,7 @@ final class ColorsCollectionView: UICollectionView {
 extension ColorsCollectionView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return colorsCollectionViewItems.count
+        colorsCollectionViewItems.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -52,20 +52,23 @@ extension ColorsCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        // TODO: Refactor
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                             withReuseIdentifier: ColorsCollectionHeader.reuseIdentifier,
-                                                                             for: indexPath
-            ) as! ColorsCollectionHeader
-            
-            headerView.titleLabel.text = "Цвет"
-            return headerView
-            
-        default:
-            fatalError("Unexpected supplementary element kind \(kind)")
+        
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            assertionFailure("Unexpected element kind: \(kind)")
+            return UICollectionReusableView()
         }
+        
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: ColorsCollectionHeader.reuseIdentifier,
+            for: indexPath
+        ) as? ColorsCollectionHeader else {
+            assertionFailure("Failed to dequeue ColorsCollectionHeader")
+            return UICollectionReusableView()
+        }
+        
+        headerView.titleLabel.text = "Цвет"
+        return headerView
         
     }
     

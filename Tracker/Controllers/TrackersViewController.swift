@@ -23,7 +23,6 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         setupConstraints()
         
         updateTrackers(for: selectedDate)
-        //        setupUIBasedOnData()
     }
     
     let viewModel = TrackersViewModel()
@@ -83,7 +82,6 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     func didUpdateTrackers() {
         print("📢 (didUpdateTrackers) Трекеры обновлены, обновляем UI!")
         updateTrackers(for: selectedDate)
-        //        setupUIBasedOnData()
     }
     
     @objc private func addTracker() {
@@ -94,7 +92,6 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     // TODO: add picked date logic
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         let chosenDate = sender.date
-        // Обновляем выбранную дату
         selectedDate = Calendar.current.startOfDay(for: chosenDate)
         print("📅 DatePicker изменён: \(sender.date) -> \(selectedDate)")
         updateTrackers(for: selectedDate)

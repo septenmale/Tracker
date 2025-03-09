@@ -5,7 +5,6 @@
 //  Created by Viktor on 30/12/2024.
 //
 
-import Foundation
 import UIKit
 
 public enum Weekday: String, Codable {

@@ -11,7 +11,7 @@ final class EmojiCollectionView: UICollectionView {
     
     weak var changeButtonStateDelegate: ChangeButtonStateDelegate?
     
-    let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
+    private let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
     
     private(set) var selectedEmoji: String?
     
@@ -36,6 +36,7 @@ final class EmojiCollectionView: UICollectionView {
 }
 
 extension EmojiCollectionView: UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return emojiCollectionViewItems.count
     }
@@ -49,22 +50,26 @@ extension EmojiCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        // TODO: Refactor
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                             withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier,
-                                                                             for: indexPath
-            ) as! EmojiCollectionHeader
-            
-            headerView.titleLabel.text = "Emoji"
-            return headerView
-            
-        default:
-            fatalError("Unexpected supplementary element kind \(kind)")
+        
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            assertionFailure("Unsupported supplementary element kind: \(kind)")
+            return UICollectionReusableView()
         }
         
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: EmojiCollectionHeader.reuseIdentifier,
+            for: indexPath
+        ) as? EmojiCollectionHeader else {
+            assertionFailure("Falied to dequeue EmojiCollectionHeader")
+            return UICollectionReusableView()
+        }
+        
+        headerView.titleLabel.text = "Emoji"
+        return headerView
+        
     }
+    
 }
 
 extension EmojiCollectionView: UICollectionViewDelegate {

@@ -6,7 +6,6 @@
 //
 
 import CoreData
-import UIKit
 
 protocol TrackerRecordStoreDelegate: AnyObject {
     func didUpdateRecords()

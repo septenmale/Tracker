@@ -7,20 +7,22 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController {
+final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
+    
+    private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Trackers"
+        viewModel.delegate = self
         
         addNavItems()
         setupStackView()
         setUpCollectionView()
         setupConstraints()
         
-        updateTrackers(for: Date())
-        setupUIBasedOnData()
+        updateTrackers(for: selectedDate)
     }
     
     let viewModel = TrackersViewModel()
@@ -62,7 +64,7 @@ final class TrackersViewController: UIViewController {
         return stackView
     }()
     
-   lazy private var plusButton: UIButton = {
+    lazy private var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "AddNewTrackerButton"), for: .normal)
         button.addTarget(self, action: #selector(addTracker), for: .touchUpInside)
@@ -77,21 +79,31 @@ final class TrackersViewController: UIViewController {
         return datePicker
     }()
     
+    func didUpdateTrackers() {
+        print("📢 (didUpdateTrackers) Трекеры обновлены, обновляем UI!")
+        updateTrackers(for: selectedDate)
+    }
+    
     @objc private func addTracker() {
         let trackerTypeViewController = TrackerTypeViewController(viewModel: self.viewModel)
-        trackerTypeViewController.delegate = self
+        trackerTypeViewController.newTrackerDelegate = self
         present(trackerTypeViewController, animated: true)
     }
     // TODO: add picked date logic
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDate = Calendar.current.startOfDay(for: sender.date)
+        let chosenDate = sender.date
+        selectedDate = Calendar.current.startOfDay(for: chosenDate)
+        print("📅 DatePicker изменён: \(sender.date) -> \(selectedDate)")
         updateTrackers(for: selectedDate)
-        setupUIBasedOnData()
     }
     
     private func updateTrackers(for date: Date) {
+        print("🔄 updateTrackers() вызван для даты: \(date)")
         filteredTrackers = viewModel.getTrackers(for: date)
+        print("📂 После вызова getTrackers, количество: \(filteredTrackers.count)")
         collectionView.reloadData()
+        setupUIBasedOnData()
+        
     }
     
     private func addNavItems() {
@@ -151,10 +163,10 @@ extension TrackersViewController: UISearchResultsUpdating {
         
     }
 }
-
+// TODO: похоже на дубль делегатом. Проверить так же TrackersViewModelDelegate второй скорее всего лишний
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateNewTracker() {
-        updateTrackers(for: Date())
+        updateTrackers(for: selectedDate)
         setupUIBasedOnData()
     }
 }

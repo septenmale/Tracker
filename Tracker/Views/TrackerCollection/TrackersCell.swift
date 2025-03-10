@@ -23,7 +23,7 @@ final class TrackersCell: UICollectionViewCell {
         return view
     }()
     
-    private let emodjiLabel: UILabel = {
+    private let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return label
@@ -87,8 +87,10 @@ final class TrackersCell: UICollectionViewCell {
         addAsCompleteButton.setImage(UIImage(systemName: buttonImage), for: .normal)
         addAsCompleteButton.alpha = isCompleted ? 0.6 : 1
         daysAmountLabel.text = "\(daysCount) \(daysCount == 1 ? "день" : "дней")"
-        emodjiLabel.text = tracker.emoji
+        emojiLabel.text = tracker.emoji
         titleLabel.text = tracker.title
+        trackerContainerView.backgroundColor = tracker.color
+        addAsCompleteButton.tintColor = tracker.color
     }
     
     private func setupStackView() {
@@ -99,13 +101,13 @@ final class TrackersCell: UICollectionViewCell {
     
     private func setupContainerView() {
         contentView.addSubview(trackerContainerView)
-        trackerContainerView.addSubview(emodjiLabel)
+        trackerContainerView.addSubview(emojiLabel)
         trackerContainerView.addSubview(titleLabel)
     }
     
     private func setupConstraints() {
         
-        emodjiLabel.translatesAutoresizingMaskIntoConstraints = false
+        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
         trackerContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -117,12 +119,12 @@ final class TrackersCell: UICollectionViewCell {
             trackerContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             trackerContainerView.heightAnchor.constraint(equalToConstant: 90),
             
-            emodjiLabel.topAnchor.constraint(equalTo: trackerContainerView.topAnchor, constant: 12),
-            emodjiLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
-            emodjiLabel.heightAnchor.constraint(equalToConstant: 24),
-            emodjiLabel.widthAnchor.constraint(equalToConstant: 24),
+            emojiLabel.topAnchor.constraint(equalTo: trackerContainerView.topAnchor, constant: 12),
+            emojiLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
+            emojiLabel.heightAnchor.constraint(equalToConstant: 24),
+            emojiLabel.widthAnchor.constraint(equalToConstant: 24),
             
-            titleLabel.topAnchor.constraint(equalTo: emodjiLabel.bottomAnchor, constant: 8),
+            titleLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 8),
             titleLabel.bottomAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: -12),
             titleLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor, constant: -12),

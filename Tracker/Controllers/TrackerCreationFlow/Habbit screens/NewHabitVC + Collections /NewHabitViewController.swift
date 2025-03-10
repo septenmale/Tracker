@@ -7,19 +7,22 @@
 
 import UIKit
 
-final class NewHabitViewController: UIViewController {
+final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
+        emojiCollectionView.changeButtonStateDelegate = self
+        colorsCollectionView.changeButtonStateDelegate = self
         
+        setupElementsInScrollView()
         setupStackView()
         setupTableView()
         setupConstraints()
     }
     
-    weak var delegate: NewTrackerDelegate?
+    weak var newTrackerDelegate: NewTrackerDelegate?
     
     private let viewModel: TrackersViewModel
     
@@ -31,6 +34,10 @@ final class NewHabitViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    private let emojiCollectionView = EmojiCollectionView()
+    
+    private let colorsCollectionView = ColorsCollectionView()
     
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     private var items = [
@@ -46,6 +53,18 @@ final class NewHabitViewController: UIViewController {
         label.text = "Новая привычка"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    private lazy var contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private let textField: UITextField = {
@@ -128,12 +147,14 @@ final class NewHabitViewController: UIViewController {
         tableView.reloadData()
     }
     
-    private func changeCreateButtonState() {
+    func changeCreateButtonState() {
         
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
         let isScheduleValid = !selectedDays.isEmpty
+        let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
+        let isColorSelected = colorsCollectionView.selectedColor != nil
         
-        if isTextFieldValid && isScheduleValid {
+        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
@@ -155,8 +176,16 @@ final class NewHabitViewController: UIViewController {
             return
         }
         
-        viewModel.addTracker(title: habitName, schedule: selectedDays)
-        delegate?.didCreateNewTracker()
+        guard let selectedEmoji = emojiCollectionView.selectedEmoji else {
+            return
+        }
+        
+        guard let selectedColor = colorsCollectionView.selectedColor else {
+            return
+        }
+        // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
+        viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor)
+        newTrackerDelegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)
         
@@ -164,6 +193,20 @@ final class NewHabitViewController: UIViewController {
     
     @objc private func backToTrackerTypeVC() {
         presentingViewController?.presentingViewController?.dismiss(animated: true)
+    }
+    
+    private func setupElementsInScrollView() {
+        view.addSubview(titleLabel)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubview(textField)
+        contentView.addSubview(warningLabel)
+        contentView.addSubview(tableView)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorsCollectionView)
+        contentView.addSubview(buttonStackView)
+        
     }
     
     private func setupTableView() {
@@ -183,7 +226,6 @@ final class NewHabitViewController: UIViewController {
     }
     
     private func setupStackView() {
-        view.addSubview(buttonStackView)
         
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
@@ -191,40 +233,58 @@ final class NewHabitViewController: UIViewController {
     
     private func setupConstraints() {
         
-        view.addSubview(titleLabel)
-        view.addSubview(textField)
-        view.addSubview(tableView)
-        view.addSubview(warningLabel)
-        
         NSLayoutConstraint.activate([
             
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
-            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            textField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            textField.topAnchor.constraint(equalTo: contentView.topAnchor),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 75),
+            // TODO: Проверять есть ли футер у textField если да сделать warningLabel футером
+            warningLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
             
-            warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 8),
-            warningLabel.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -32),
-            
-            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 62),
+            tableView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: textField.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: textField.trailingAnchor),
             tableView.heightAnchor.constraint(equalToConstant: 150),
             
+            emojiCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            emojiCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            
+            colorsCollectionView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            colorsCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 34),
+            colorsCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
+            colorsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
+            colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
+            
             createButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
-            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            
+            buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            buttonStackView.topAnchor.constraint(equalTo: colorsCollectionView.bottomAnchor, constant: 16),
+            buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
+            buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4)
+                        
         ])
         
     }

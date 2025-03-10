@@ -10,7 +10,7 @@ import UIKit
 final class TrackerTypeViewController: UIViewController {
     
     private let viewModel: TrackersViewModel
-    weak var delegate: NewTrackerDelegate?
+    weak var newTrackerDelegate: NewTrackerDelegate?
     
     init(viewModel: TrackersViewModel) {
         self.viewModel = viewModel
@@ -70,13 +70,13 @@ final class TrackerTypeViewController: UIViewController {
     
     @objc private func switchToHabbitController() {
         let newHabitViewController = NewHabitViewController(viewModel: self.viewModel)
-        newHabitViewController.delegate = delegate
+        newHabitViewController.newTrackerDelegate = newTrackerDelegate
         present(newHabitViewController, animated: true)
     }
     
     @objc private func switchToEventController() {
         let newEventViewController = NewEventViewController(viewModel: self.viewModel)
-        newEventViewController.delegate = delegate
+        newEventViewController.newTrackerDelegate = newTrackerDelegate
         present(newEventViewController, animated: true)
     }
     

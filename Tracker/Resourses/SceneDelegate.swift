@@ -8,19 +8,26 @@
 import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
+    
     var window: UIWindow?
-
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        let vc = TabViewController()
-        
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = vc
+        window.rootViewController = OnboardingViewController()
         window.makeKeyAndVisible()
         self.window = window
+    }
+    
+    func changeRootViewController(to viewController: UIViewController) {
+        guard let window else { return }
         
+        window.rootViewController = viewController
+        UIView.transition(with: window,
+                          duration: 0.4,
+                          options: .transitionCrossDissolve,
+                          animations: nil)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

@@ -10,7 +10,6 @@ import UIKit
 final class firstScreenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
     }
     
@@ -49,7 +48,6 @@ final class firstScreenVC: UIViewController {
             
         ])
     }
-    
 }
 
 @available(iOS 17, *)

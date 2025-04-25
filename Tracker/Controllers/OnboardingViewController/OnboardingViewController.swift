@@ -63,6 +63,7 @@ final class OnboardingViewController: UIPageViewController {
     
     @objc
     private func didTapContinue() {
+        UserDefaults.standard.setValue(true, forKey: "isOnboardingCompleted")
         (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?
             .changeRootViewController(to: TabViewController())
     }

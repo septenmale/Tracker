@@ -10,7 +10,6 @@ import UIKit
 final class secondScreenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
     }
     
@@ -49,7 +48,6 @@ final class secondScreenVC: UIViewController {
             
         ])
     }
-    
 }
 
 @available(iOS 17, *)

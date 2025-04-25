@@ -24,6 +24,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     
     weak var newTrackerDelegate: NewTrackerDelegate?
     
+    private let categoryVC: CategoryViewController
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let items = [
         ("Категория", "")
@@ -35,8 +36,9 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     
     private let viewModel: TrackersViewModel
     
-    init(viewModel: TrackersViewModel) {
+    init(viewModel: TrackersViewModel, vc: CategoryViewController) {
         self.viewModel = viewModel
+        self.categoryVC = vc
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -278,8 +280,7 @@ extension NewEventViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            break
-            
+            present(categoryVC, animated: true)
         default:
             break
         }

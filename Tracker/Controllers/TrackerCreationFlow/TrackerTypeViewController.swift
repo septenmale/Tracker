@@ -8,7 +8,8 @@
 import UIKit
 
 final class TrackerTypeViewController: UIViewController {
-    
+    // переименовать старую VM + создать новую 
+    private let categoryVC = CategoryViewController()
     private let viewModel: TrackersViewModel
     weak var newTrackerDelegate: NewTrackerDelegate?
     
@@ -52,7 +53,7 @@ final class TrackerTypeViewController: UIViewController {
         button.backgroundColor = .blackDay
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
-        button.addTarget(self, action: #selector(switchToHabbitController), for: .touchUpInside)
+        button.addTarget(self, action: #selector(switchToHabitController), for: .touchUpInside)
         return button
     }()
     
@@ -68,14 +69,14 @@ final class TrackerTypeViewController: UIViewController {
         return button
     }()
     
-    @objc private func switchToHabbitController() {
-        let newHabitViewController = NewHabitViewController(viewModel: self.viewModel)
+    @objc private func switchToHabitController() {
+        let newHabitViewController = NewHabitViewController(viewModel: self.viewModel, vc: categoryVC)
         newHabitViewController.newTrackerDelegate = newTrackerDelegate
         present(newHabitViewController, animated: true)
     }
     
     @objc private func switchToEventController() {
-        let newEventViewController = NewEventViewController(viewModel: self.viewModel)
+        let newEventViewController = NewEventViewController(viewModel: self.viewModel, vc: categoryVC)
         newEventViewController.newTrackerDelegate = newTrackerDelegate
         present(newEventViewController, animated: true)
     }
@@ -89,7 +90,6 @@ final class TrackerTypeViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        
         view.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -108,7 +108,5 @@ final class TrackerTypeViewController: UIViewController {
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-        
     }
-    
 }

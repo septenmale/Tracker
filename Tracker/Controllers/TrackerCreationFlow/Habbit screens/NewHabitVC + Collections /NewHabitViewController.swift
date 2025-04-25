@@ -24,10 +24,12 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     
     weak var newTrackerDelegate: NewTrackerDelegate?
     
+    private let categoryVC: CategoryViewController
     private let viewModel: TrackersViewModel
     
-    init(viewModel: TrackersViewModel) {
+    init(viewModel: TrackersViewModel, vc: CategoryViewController) {
         self.viewModel = viewModel
+        self.categoryVC = vc
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -226,15 +228,12 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     }
     
     private func setupStackView() {
-        
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
     }
     
     private func setupConstraints() {
-        
         NSLayoutConstraint.activate([
-            
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
@@ -254,7 +253,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
             textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 75),
-            // TODO: Проверять есть ли футер у textField если да сделать warningLabel футером
+            
             warningLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
             
@@ -284,15 +283,11 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
             buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
             buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4)
-                        
         ])
-        
     }
-    
 }
 
 extension NewHabitViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let tableHeight = tableView.bounds.height
         return tableHeight / CGFloat(items.count)
@@ -309,6 +304,9 @@ extension NewHabitViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //TODO: Добавить переход на экран с категориями.
+        // Думаю что стоит сделать его одним для каждого из видов трекера прокидывая изменения в зависимоти
+        // откуда был переход
         if indexPath.row == 1 {
             let scheduleVC = ScheduleViewController()
             scheduleVC.selectedWeekdays = selectedDays
@@ -319,9 +317,10 @@ extension NewHabitViewController: UITableViewDelegate {
             }
             
             present(scheduleVC, animated: true)
+        } else if indexPath.row == 0 {
+            present(categoryVC, animated: true)
         }
     }
-    
 }
 
 extension NewHabitViewController: UITableViewDataSource {

@@ -10,18 +10,18 @@ import UIKit
 protocol TrackersViewModelDelegate: AnyObject {
     func didUpdateTrackers()
 }
-
+//TODO: category store перенести в новую VM
 final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegate, TrackerRecordStoreDelegate {
     
     weak var delegate: TrackersViewModelDelegate?
     
     private let trackerStore = TrackerStore()
-    private let categoryStore = TrackerCategoryStore()
+//    private let categoryStore = TrackerCategoryStore()
     private let recordStore = TrackerRecordStore()
     
     init() {
         trackerStore.delegate = self
-        categoryStore.delegate = self
+//        categoryStore.delegate = self
         recordStore.delegate = self
     }
     

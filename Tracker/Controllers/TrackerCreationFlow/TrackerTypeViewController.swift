@@ -8,13 +8,16 @@
 import UIKit
 
 final class TrackerTypeViewController: UIViewController {
-    // переименовать старую VM + создать новую 
-    private let categoryVC = CategoryViewController()
-    private let viewModel: TrackersViewModel
+    // Обьявить модель и привязать ее к вью модели
+    private let categoryModel = TrackerCategoryStore()
+    private lazy var categoryViewModel = TrackerCategoryViewModel(model: categoryModel)
+    private lazy var categoryVC = CategoryViewController(viewModel: categoryViewModel)
+    
+    private let trackerViewModel: TrackersViewModel
     weak var newTrackerDelegate: NewTrackerDelegate?
     
     init(viewModel: TrackersViewModel) {
-        self.viewModel = viewModel
+        self.trackerViewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -70,13 +73,13 @@ final class TrackerTypeViewController: UIViewController {
     }()
     
     @objc private func switchToHabitController() {
-        let newHabitViewController = NewHabitViewController(viewModel: self.viewModel, vc: categoryVC)
+        let newHabitViewController = NewHabitViewController(viewModel: self.trackerViewModel, vc: categoryVC)
         newHabitViewController.newTrackerDelegate = newTrackerDelegate
         present(newHabitViewController, animated: true)
     }
     
     @objc private func switchToEventController() {
-        let newEventViewController = NewEventViewController(viewModel: self.viewModel, vc: categoryVC)
+        let newEventViewController = NewEventViewController(viewModel: self.trackerViewModel, vc: categoryVC)
         newEventViewController.newTrackerDelegate = newTrackerDelegate
         present(newEventViewController, animated: true)
     }

@@ -6,38 +6,17 @@
 //
 
 import UIKit
-
+// Этот протокол для обновления UI в TrackerVC
 protocol TrackersViewModelDelegate: AnyObject {
     func didUpdateTrackers()
 }
 //TODO: category store перенести в новую VM
-final class TrackersViewModel: TrackerStoreDelegate, TrackerCategoryStoreDelegate, TrackerRecordStoreDelegate {
+final class TrackersViewModel {
     
     weak var delegate: TrackersViewModelDelegate?
     
     private let trackerStore = TrackerStore()
-//    private let categoryStore = TrackerCategoryStore()
     private let recordStore = TrackerRecordStore()
-    
-    init() {
-        trackerStore.delegate = self
-//        categoryStore.delegate = self
-        recordStore.delegate = self
-    }
-    
-    // MARK: - Делегатные методы для обновления UI
-    
-    func didUpdateTrackers() {
-        delegate?.didUpdateTrackers()
-    }
-    
-    func didUpdateCategories() {
-        delegate?.didUpdateTrackers()
-    }
-    
-    func didUpdateRecords() {
-        delegate?.didUpdateTrackers()
-    }
     
     func getTrackers(for date: Date) -> [TrackerCategory] {
         // Обновляем выборку записей для выбранной даты

@@ -14,6 +14,17 @@ final class CategoryViewController: UIViewController {
         setupUI()
     }
     
+    private let viewModel: TrackerCategoryViewModel
+    
+    init(viewModel: TrackerCategoryViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Категория"
@@ -65,7 +76,7 @@ final class CategoryViewController: UIViewController {
     
     @objc
     private func addCategoryButtonDidTap() {
-        let newCategoryVC = NewCategoryViewController()
+        let newCategoryVC = NewCategoryViewController(viewModel: viewModel)
         present(newCategoryVC, animated: true)
     }
     
@@ -89,7 +100,8 @@ final class CategoryViewController: UIViewController {
     }
 }
 
-@available(iOS 17, *)
-#Preview {
-    CategoryViewController()
-}
+//@available(iOS 17, *)
+//#Preview {
+//    let viewModel: TrackerCategoryViewModel
+//    CategoryViewController(viewModel: viewModel)
+//}

@@ -6,8 +6,18 @@
 //
 
 import UIKit
-
+// Это View - связь только с VM
 class NewCategoryViewController: UIViewController {
+    private let viewModel: TrackerCategoryViewModel
+    
+    init(viewModel: TrackerCategoryViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +63,8 @@ class NewCategoryViewController: UIViewController {
     
     @objc
     private func submitButtonDidTap() {
+        guard let text = textField.text else { return }
+        viewModel.saveCategory(name: text)
         // возможно что здесь по нажатию случается запись категории из
         // textField.text в БД и происходить закрытие окна
     }
@@ -99,7 +111,8 @@ extension NewCategoryViewController: UITextFieldDelegate {
     }
 }
 
-@available(iOS 17, *)
-#Preview {
-    NewCategoryViewController()
-}
+//@available(iOS 17, *)
+//#Preview {
+//    let viewModel: TrackerCategoryViewModel
+//    NewCategoryViewController(viewModel: viewModel)
+//}

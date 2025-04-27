@@ -6,7 +6,7 @@
 //
 
 import CoreData
-    // Должна быть связана с ViewModel
+// Должна быть связана с ViewModel
 final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     private let context: NSManagedObjectContext
     
@@ -18,6 +18,27 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     init(context: NSManagedObjectContext) {
         self.context = context
     }
+    //TODO: Добавить FRC чтобы связать Model и ViewModel
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        let frc = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        frc.delegate = self
+        
+        do {
+            try frc.performFetch()
+        } catch {
+            assertionFailure("Failed to initialize FRC: \(error.localizedDescription)")
+        }
+        return frc
+    }()
     
     func saveCategory(_ category: TrackerCategory) {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
@@ -38,5 +59,19 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    //Добавить метод для загрузки всех категорий
+    func fetchAllCategories() -> [TrackerCategory] {
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            return results.compactMap { coreDataDevice in
+                guard let title = coreDataDevice.title else { return nil }
+                return TrackerCategory(title: title, items: [])
+            }
+        } catch {
+            assertionFailure("Failed to add device: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
 }

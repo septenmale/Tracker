@@ -25,5 +25,8 @@ final class TrackerCategoryViewModel {
         model.saveCategory(category)
     }
     
-    //добавить метод чтобы через Model передать данные во View
+    func showAllTitles() -> [String] {
+        let models = model.fetchAllCategories()
+        return models.map { $0.title }
+    }
 }

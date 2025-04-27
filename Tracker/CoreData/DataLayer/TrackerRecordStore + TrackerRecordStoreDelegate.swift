@@ -16,7 +16,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     weak var delegate: TrackerRecordStoreDelegate?
     private let context: NSManagedObjectContext
     
-    lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
+    lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = { 
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]

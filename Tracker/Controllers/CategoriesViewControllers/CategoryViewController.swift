@@ -14,6 +14,11 @@ final class CategoryViewController: UIViewController {
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
     private let viewModel: TrackerCategoryViewModel
     
     init(viewModel: TrackerCategoryViewModel) {
@@ -25,7 +30,9 @@ final class CategoryViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let items = ["Продукты", "Домашнее хранение", "Транспорт", "Здоровье", "Другое"]
+    // черновая версия чтобы проверить что реализация сохранения и получения
+    // категорий правильная. На данный момент View и ViewModel не синхронизированны. Сделаю это через bindings
+    private lazy var testItems = viewModel.showAllTitles()
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -74,8 +81,6 @@ final class CategoryViewController: UIViewController {
         label.textColor = .black
         return label
     }()
-    
-    // тут добавить таблицу которая берет список категорий из БД
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton()
@@ -132,7 +137,7 @@ extension CategoryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == items.count - 1 {
+        if indexPath.row == testItems.count - 1 {
             cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
             cell.layer.cornerRadius = 16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -146,12 +151,12 @@ extension CategoryViewController: UITableViewDelegate {
 
 extension CategoryViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        items.count
+        testItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-        cell.textLabel?.text = items[indexPath.row]
+        cell.textLabel?.text = testItems[indexPath.row]
         cell.textLabel?.textColor = .black
         cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.backgroundColor = .tBackground

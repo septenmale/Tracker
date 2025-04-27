@@ -65,8 +65,7 @@ class NewCategoryViewController: UIViewController {
     private func submitButtonDidTap() {
         guard let text = textField.text else { return }
         viewModel.saveCategory(name: text)
-        // возможно что здесь по нажатию случается запись категории из
-        // textField.text в БД и происходить закрытие окна
+        dismiss(animated: true)
     }
     
     private func changeButtonState(_ isTextEmpty: Bool) {

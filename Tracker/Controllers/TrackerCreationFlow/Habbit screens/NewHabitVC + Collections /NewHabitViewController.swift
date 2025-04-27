@@ -216,7 +216,6 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.separatorStyle = .singleLine
-        tableView.separatorInset = UIEdgeInsets.zero
         tableView.layoutMargins = UIEdgeInsets.zero
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.layer.cornerRadius = 16
@@ -322,7 +321,7 @@ extension NewHabitViewController: UITableViewDelegate {
         }
     }
 }
-
+    // прокрктка у расписание 
 extension NewHabitViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count

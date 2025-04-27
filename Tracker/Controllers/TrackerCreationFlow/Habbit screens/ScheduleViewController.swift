@@ -49,9 +49,8 @@ final class ScheduleViewController: UIViewController {
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.separatorStyle = .singleLine
-        tableView.separatorInset = UIEdgeInsets.zero
-        tableView.layoutMargins = UIEdgeInsets.zero
+        tableView.isScrollEnabled = false
+        tableView.layoutMargins = .init(top: 26, left: 16, bottom: 26, right: 16)
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.layer.cornerRadius = 16
         tableView.layer.masksToBounds = false
@@ -83,7 +82,6 @@ final class ScheduleViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        
         view.addSubview(titleLabel)
         view.addSubview(submitButton)
         
@@ -105,9 +103,7 @@ final class ScheduleViewController: UIViewController {
             submitButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
             
         ])
-        
     }
-    
 }
 
 extension ScheduleViewController: UITableViewDataSource {
@@ -139,7 +135,6 @@ extension ScheduleViewController: UITableViewDataSource {
 }
 
 extension ScheduleViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let tableHeight = tableView.bounds.height
         return tableHeight / CGFloat(weekdays.count)
@@ -148,9 +143,12 @@ extension ScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == weekdays.count - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
-        } else {
-            cell.separatorInset = UIEdgeInsets.zero
         }
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
     }
+    
+}
+
+@available(iOS 17, *)
+#Preview {
+    ScheduleViewController()
 }

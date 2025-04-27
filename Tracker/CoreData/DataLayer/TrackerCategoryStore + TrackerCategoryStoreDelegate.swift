@@ -37,4 +37,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             assertionFailure("Failed to add device: \(error.localizedDescription)")
         }
     }
+    
+    //Добавить метод для загрузки всех категорий
 }

@@ -15,7 +15,7 @@ final class TrackerCategoryViewModel {
     init(model: TrackerCategoryStore) {
         self.model = model
     }
-    //Должен быть метод по сохранению категории
+    
     func saveCategory(name: String) {
         let category = TrackerCategory(
             title: name,
@@ -24,4 +24,6 @@ final class TrackerCategoryViewModel {
         
         model.saveCategory(category)
     }
+    
+    //добавить метод чтобы через Model передать данные во View
 }

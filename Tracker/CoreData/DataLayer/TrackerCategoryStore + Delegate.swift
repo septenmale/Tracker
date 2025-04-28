@@ -6,8 +6,14 @@
 //
 
 import CoreData
-// Должна быть связана с ViewModel
-final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
+
+// Модель с которой связана с ViewModel. Модель не знает про конкретную ViewModel
+protocol TrackerCategoryStoreDelegate: AnyObject {
+    func didUpdateCategories()
+}
+
+final class TrackerCategoryStore: NSObject {
+    weak var delegate: TrackerCategoryStoreDelegate?
     private let context: NSManagedObjectContext
     
     convenience override init() {
@@ -17,8 +23,11 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     
     init(context: NSManagedObjectContext) {
         self.context = context
+        super.init()
+        _ = fetchedResultsController
+        
     }
-    //TODO: Добавить FRC чтобы связать Model и ViewModel
+    
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
@@ -69,9 +78,15 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
                 return TrackerCategory(title: title, items: [])
             }
         } catch {
-            assertionFailure("Failed to add device: \(error.localizedDescription)")
+            assertionFailure("Failed to fetch categories: \(error.localizedDescription)")
             return []
         }
     }
-    
+}
+
+//MARK: - FetchResultsController Delegate
+extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        delegate?.didUpdateCategories()
+    }
 }

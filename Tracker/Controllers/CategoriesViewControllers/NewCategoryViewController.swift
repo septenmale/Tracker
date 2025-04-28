@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// Это View - связь только с VM
+
 class NewCategoryViewController: UIViewController {
     private let viewModel: TrackerCategoryViewModel
     
@@ -34,7 +34,7 @@ class NewCategoryViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     private let textField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Введите название категории"
@@ -95,6 +95,7 @@ class NewCategoryViewController: UIViewController {
     }
 }
 
+//MARK: - TextField Delegate
 extension NewCategoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -109,9 +110,3 @@ extension NewCategoryViewController: UITextFieldDelegate {
         return true
     }
 }
-
-//@available(iOS 17, *)
-//#Preview {
-//    let viewModel: TrackerCategoryViewModel
-//    NewCategoryViewController(viewModel: viewModel)
-//}

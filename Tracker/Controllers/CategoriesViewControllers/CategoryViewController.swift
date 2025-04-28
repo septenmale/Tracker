@@ -11,14 +11,10 @@ final class CategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        bind()
         setupUI()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        tableView.reloadData()
-    }
-    
+        
     private let viewModel: TrackerCategoryViewModel
     
     init(viewModel: TrackerCategoryViewModel) {
@@ -30,9 +26,9 @@ final class CategoryViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // черновая версия чтобы проверить что реализация сохранения и получения
-    // категорий правильная. На данный момент View и ViewModel не синхронизированны. Сделаю это через bindings
-    private lazy var testItems = viewModel.showAllTitles()
+    private var titles: [String] {
+        viewModel.showAllTitles()
+    }
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
@@ -101,6 +97,12 @@ final class CategoryViewController: UIViewController {
         present(newCategoryVC, animated: true)
     }
     
+    private func bind() {
+        viewModel.didChangeContent = { [weak self] _ in
+            self?.tableView.reloadData()
+        }
+    }
+    
     private func setupUI() {
         view.addSubview(titleLabel)
         view.addSubview(stubStackView)
@@ -128,6 +130,7 @@ final class CategoryViewController: UIViewController {
 }
 
 extension CategoryViewController: UITableViewDelegate {
+    //TODO: Передавать на экран создания привычки выбранную категорию. 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.visibleCells.forEach { $0.accessoryType = .none }
         
@@ -137,7 +140,7 @@ extension CategoryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == testItems.count - 1 {
+        if indexPath.row == titles.count - 1 {
             cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
             cell.layer.cornerRadius = 16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -151,12 +154,12 @@ extension CategoryViewController: UITableViewDelegate {
 
 extension CategoryViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        testItems.count
+        titles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-        cell.textLabel?.text = testItems[indexPath.row]
+        cell.textLabel?.text = titles[indexPath.row]
         cell.textLabel?.textColor = .black
         cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.backgroundColor = .tBackground
@@ -165,9 +168,9 @@ extension CategoryViewController: UITableViewDataSource {
     }
 }
 
-@available(iOS 17, *)
-#Preview {
-    let model = TrackerCategoryStore()
-    let viewModel = TrackerCategoryViewModel(model: model)
-    CategoryViewController(viewModel: viewModel)
-}
+//@available(iOS 17, *)
+//#Preview {
+//    let model = TrackerCategoryStore()
+//    let viewModel = TrackerCategoryViewModel(model: model)
+//    CategoryViewController(viewModel: viewModel)
+//}

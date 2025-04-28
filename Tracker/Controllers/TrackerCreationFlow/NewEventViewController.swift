@@ -15,6 +15,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
         textField.delegate = self
         emojiCollectionView.changeButtonStateDelegate = self
         colorsCollectionView.changeButtonStateDelegate = self
+        categoryVC.delegate = self
         
         setupElementsInScrollView()
         setupStackView()
@@ -26,7 +27,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     
     private let categoryVC: CategoryViewController
     private let tableView = UITableView(frame: .zero, style: .plain)
-    private let items = [
+    private var items = [
         ("Категория", "")
     ]
     
@@ -129,19 +130,17 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     }()
     
     func changeCreateButtonState() {
-        
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
         let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
         let isColorSelected = colorsCollectionView.selectedColor != nil
-        
-        if isTextFieldValid && isEmojiSelected && isColorSelected {
+        // Возможно вынести в отдельную функцию/переменную 
+        if isTextFieldValid && isEmojiSelected && isColorSelected && items[0].1 != "" {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
             createButton.backgroundColor = .tGray
             createButton.isEnabled = false
         }
-        
     }
     
     private func setupElementsInScrollView() {
@@ -235,9 +234,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     }
     
     @objc private  func createNewEvent() {
-        
-        guard let eventName = textField.text, !eventName.isEmpty else {
-            // TODO: Show alert
+        guard let eventName = textField.text else {
             return
         }
         
@@ -248,7 +245,10 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
         guard let selectedColor = colorsCollectionView.selectedColor else {
             return
         }
-        // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
+        
+        let categoryName = items[0].1
+        
+        // TODO: Передать название категории как параметр
         viewModel.addTracker(title: eventName, schedule: [], emoji: selectedEmoji, color: selectedColor)
 
         newTrackerDelegate?.didCreateNewTracker()
@@ -316,7 +316,6 @@ extension NewEventViewController: UITableViewDataSource {
 }
 
 extension NewEventViewController : UITextFieldDelegate {
-    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let maxLength = 38
         let currentText = textField.text ?? ""
@@ -335,5 +334,12 @@ extension NewEventViewController : UITextFieldDelegate {
         changeCreateButtonState()
         return true
     }
-    
+}
+
+extension NewEventViewController: CategoryViewControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        items [0].1 = category
+        changeCreateButtonState()
+        tableView.reloadData()
+    }
 }

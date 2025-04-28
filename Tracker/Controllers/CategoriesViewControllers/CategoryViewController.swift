@@ -7,16 +7,11 @@
 
 import UIKit
 // Эта вью связана с VM и обновляет таблицу
+protocol CategoryViewControllerDelegate: AnyObject {
+    func didSelectCategory(_ category: String)
+}
+
 final class CategoryViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        bind()
-        setupUI()
-    }
-        
-    private let viewModel: TrackerCategoryViewModel
-    
     init(viewModel: TrackerCategoryViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -26,6 +21,20 @@ final class CategoryViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        bind()
+        setupUI()
+    }
+    // Проставил так, но при закрытии/открытии экрана выделение пропадает. Баг ?
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        tableView.visibleCells.forEach { $0.accessoryType = .none }
+    }
+
+    weak var delegate: CategoryViewControllerDelegate?
+    private let viewModel: TrackerCategoryViewModel
     private var titles: [String] {
         viewModel.showAllTitles()
     }
@@ -130,13 +139,14 @@ final class CategoryViewController: UIViewController {
 }
 
 extension CategoryViewController: UITableViewDelegate {
-    //TODO: Передавать на экран создания привычки выбранную категорию. 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.visibleCells.forEach { $0.accessoryType = .none }
         
         if let cell = tableView.cellForRow(at: indexPath) {
             cell.accessoryType = .checkmark
         }
+        
+        delegate?.didSelectCategory(tableView.cellForRow(at: indexPath)?.textLabel?.text ?? "По умолчанию")
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

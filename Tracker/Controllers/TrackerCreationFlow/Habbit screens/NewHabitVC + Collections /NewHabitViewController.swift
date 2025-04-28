@@ -8,6 +8,15 @@
 import UIKit
 
 final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate {
+    init(viewModel: TrackersViewModel, vc: CategoryViewController) {
+        self.viewModel = viewModel
+        self.categoryVC = vc
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -15,6 +24,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         textField.delegate = self
         emojiCollectionView.changeButtonStateDelegate = self
         colorsCollectionView.changeButtonStateDelegate = self
+        categoryVC.delegate = self
         
         setupElementsInScrollView()
         setupStackView()
@@ -26,16 +36,6 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     
     private let categoryVC: CategoryViewController
     private let viewModel: TrackersViewModel
-    
-    init(viewModel: TrackersViewModel, vc: CategoryViewController) {
-        self.viewModel = viewModel
-        self.categoryVC = vc
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     private let emojiCollectionView = EmojiCollectionView()
     
@@ -150,31 +150,22 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     }
     
     func changeCreateButtonState() {
-        
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
         let isScheduleValid = !selectedDays.isEmpty
         let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
         let isColorSelected = colorsCollectionView.selectedColor != nil
-        
-        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected {
+        // Возможно вынести в отдельную функцию/переменную
+        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected && !selectedDays.isEmpty && items[0].1 != "" {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
             createButton.backgroundColor = .tGray
             createButton.isEnabled = false
         }
-        
     }
     
     @objc private  func createNewHabit() {
-        
-        guard let habitName = textField.text, !habitName.isEmpty else {
-            //TODO: Show alert
-            return
-        }
-        
-        guard !selectedDays.isEmpty else {
-            //TODO: Show alert
+        guard let habitName = textField.text else {
             return
         }
         
@@ -185,12 +176,14 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         guard let selectedColor = colorsCollectionView.selectedColor else {
             return
         }
-        // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
+        
+        let categoryName = items[0].1
+        
+        // TODO: Передать название категории как параметр
         viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor)
         newTrackerDelegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)
-        
     }
     
     @objc private func backToTrackerTypeVC() {
@@ -303,9 +296,6 @@ extension NewHabitViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //TODO: Добавить переход на экран с категориями.
-        // Думаю что стоит сделать его одним для каждого из видов трекера прокидывая изменения в зависимоти
-        // откуда был переход
         if indexPath.row == 1 {
             let scheduleVC = ScheduleViewController()
             scheduleVC.selectedWeekdays = selectedDays
@@ -321,7 +311,7 @@ extension NewHabitViewController: UITableViewDelegate {
         }
     }
 }
-    // прокрктка у расписание 
+
 extension NewHabitViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -350,7 +340,6 @@ extension NewHabitViewController: UITableViewDataSource {
 }
 
 extension NewHabitViewController : UITextFieldDelegate {
-    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let maxLength = 38
         let currentText = textField.text ?? ""
@@ -369,5 +358,12 @@ extension NewHabitViewController : UITextFieldDelegate {
         changeCreateButtonState()
         return true
     }
-    
+}
+
+extension NewHabitViewController: CategoryViewControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        items [0].1 = category
+        changeCreateButtonState()
+        tableView.reloadData()
+    }
 }

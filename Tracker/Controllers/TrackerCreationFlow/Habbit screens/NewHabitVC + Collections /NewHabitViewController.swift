@@ -180,7 +180,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         let categoryName = items[0].1
         
         // TODO: Передать название категории как параметр
-        viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor)
+        viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor, category: categoryName)
         newTrackerDelegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)

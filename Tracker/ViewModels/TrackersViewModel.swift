@@ -10,18 +10,18 @@ import UIKit
 protocol TrackersViewModelDelegate: AnyObject {
     func didUpdateTrackers()
 }
-//TODO: category store перенести в новую VM
+
 final class TrackersViewModel {
     
     weak var delegate: TrackersViewModelDelegate?
     
     private let trackerStore = TrackerStore()
     private let recordStore = TrackerRecordStore()
-    
+    private let categoryStore = TrackerCategoryStore.shared
+    //TODO: Тут обьединить получение всех категорий и трекером и приготовить готовый для отображение обьект.           Заменить получение trackerStore.fetchTrackers() на метод fetchAllCategories
     func getTrackers(for date: Date) -> [TrackerCategory] {
         // Обновляем выборку записей для выбранной даты
         recordStore.updateFetchRequest(for: date)
-//        let startOfDay = Calendar.current.startOfDay(for: date)
         
         // Получаем записи (TrackerRecordCoreData) для выбранной даты
         guard let recordsForDate = recordStore.fetchedResultsController.fetchedObjects else {
@@ -34,8 +34,7 @@ final class TrackersViewModel {
             return record.trackers?.id
         }
         
-        // Получаем все трекеры из хранилища
-        let allTrackers = trackerStore.fetchTrackers()
+        let allCategories = categoryStore.fetchAllCategories()
         
         // Определяем день недели для выбранной даты (например, .monday, .tuesday, …)
         let dayOfWeek = weekdayFromDate(date)
@@ -46,29 +45,26 @@ final class TrackersViewModel {
         //   - Если событие уже отмечалось, показываем его только, если оно отмечено на выбранную дату.
         // Для привычек (если schedule не пустой):
         //   - Показываем трекер только, если выбранный день содержится в его расписании.
-        let filteredTrackers = allTrackers.filter { tracker in
-            if tracker.schedule.isEmpty {
-                let totalCompletionCount = recordStore.getDaysAmount(for: tracker.id)
-                let isCompletedToday = completedIDsForDate.contains(tracker.id)
-                if totalCompletionCount == 0 {
-                    // Никогда не отмечался – показываем во все дни
-                    return true
+        let filteredCategories: [TrackerCategory] = allCategories.compactMap { category in
+            let visibleTrackers = category.items.filter { tracker in
+                if tracker.schedule.isEmpty {
+                    let totalCompletionCount = recordStore.getDaysAmount(for: tracker.id)
+                    let isCompletedToday = completedIDsForDate.contains(tracker.id)
+                    
+                    if totalCompletionCount == 0 {
+                        return true
+                    } else {
+                        return isCompletedToday
+                    }
                 } else {
-                    // Уже отмечался – показываем только если сегодня отмечен
-                    return isCompletedToday
+                    return tracker.schedule.contains(dayOfWeek)
                 }
-            } else {
-                return tracker.schedule.contains(dayOfWeek)
             }
+            
+            return visibleTrackers.isEmpty ? nil : TrackerCategory(title: category.title, items: visibleTrackers)
         }
         
-        // Если после фильтрации нет трекеров, возвращаем пустой массив, чтобы UI показал заглушку
-        if filteredTrackers.isEmpty {
-            return []
-        }
-        
-        let defaultCategory = TrackerCategory(title: "По умолчанию", items: filteredTrackers)
-        return [defaultCategory]
+        return filteredCategories
     }
     
     // Вспомогательный метод для определения дня недели из даты
@@ -118,8 +114,8 @@ final class TrackersViewModel {
         // Если хотя бы одна запись связана с данным трекером, считаем его выполненным
         return records.contains { $0.trackers?.id == tracker.id }
     }
-    
-    func addTracker(title: String, schedule: [Int], emoji: String, color: UIColor) {
+    // Разобраться с "let weekdays"
+    func addTracker(title: String, schedule: [Int], emoji: String, color: UIColor, category: String) {
         let weekdays: [Weekday] = schedule.compactMap { index in
             switch index {
             case 0: return .monday
@@ -133,12 +129,10 @@ final class TrackersViewModel {
             }
         }
         let newTracker = Tracker(id: UUID(), title: title, color: color, emoji: emoji, schedule: weekdays)
-        trackerStore.addTracker(newTracker)
+        trackerStore.addTracker(newTracker, category)
     }
     
     // MARK: - Получение количества дней, когда трекер был выполнен
-    //
-    // Вся логика получения количества дней теперь инкапсулирована в TrackerRecordStore.
     func getDaysAmount(_ tracker: Tracker) -> Int {
         return recordStore.getDaysAmount(for: tracker.id)
     }

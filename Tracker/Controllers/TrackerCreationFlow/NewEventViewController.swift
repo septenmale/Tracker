@@ -176,9 +176,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     }
     
     private func setupConstraints() {
-        
         NSLayoutConstraint.activate([
-            
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
@@ -228,9 +226,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
             buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
             buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
-            
         ])
-        
     }
     
     @objc private  func createNewEvent() {
@@ -249,7 +245,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
         let categoryName = items[0].1
         
         // TODO: Передать название категории как параметр
-        viewModel.addTracker(title: eventName, schedule: [], emoji: selectedEmoji, color: selectedColor)
+        viewModel.addTracker(title: eventName, schedule: [], emoji: selectedEmoji, color: selectedColor, category: categoryName)
 
         newTrackerDelegate?.didCreateNewTracker()
         

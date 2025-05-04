@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// Эта вью связана с VM и обновляет таблицу
+
 protocol CategoryViewControllerDelegate: AnyObject {
     func didSelectCategory(_ category: String)
 }
@@ -138,6 +138,7 @@ final class CategoryViewController: UIViewController {
     }
 }
 
+//MARK: - TableViewDelegate
 extension CategoryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.visibleCells.forEach { $0.accessoryType = .none }
@@ -162,6 +163,7 @@ extension CategoryViewController: UITableViewDelegate {
     }
 }
 
+//MARK: - TableViewDataSource
 extension CategoryViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         titles.count

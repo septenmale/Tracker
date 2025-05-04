@@ -7,12 +7,14 @@
 
 import CoreData
 
-// Модель с которой связана с ViewModel. Модель не знает про конкретную ViewModel
+// Модель с которой связана ViewModel. Модель не знает про конкретную ViewModel
+
 protocol TrackerCategoryStoreDelegate: AnyObject {
     func didUpdateCategories()
 }
 
 final class TrackerCategoryStore: NSObject {
+    static let shared = TrackerCategoryStore()
     weak var delegate: TrackerCategoryStoreDelegate?
     private let context: NSManagedObjectContext
     
@@ -25,7 +27,6 @@ final class TrackerCategoryStore: NSObject {
         self.context = context
         super.init()
         _ = fetchedResultsController
-        
     }
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
@@ -69,18 +70,35 @@ final class TrackerCategoryStore: NSObject {
     }
     
     func fetchAllCategories() -> [TrackerCategory] {
-        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        guard let fetchedCategories = fetchedResultsController.fetchedObjects else { return [] }
         
-        do {
-            let results = try context.fetch(fetchRequest)
-            return results.compactMap { coreDataDevice in
-                guard let title = coreDataDevice.title else { return nil }
-                return TrackerCategory(title: title, items: [])
+        let refinedCategories: [TrackerCategory] = fetchedCategories.compactMap { coreDataCategory in
+            guard let categoryTitle = coreDataCategory.title else {
+                print("⚠️ Пропущена категория без названия")
+                return nil
             }
-        } catch {
-            assertionFailure("Failed to fetch categories: \(error.localizedDescription)")
-            return []
+            let trackersCoreData = coreDataCategory.trackers as? Set<TrackerCoreData> ?? []
+            
+            let trackers: [Tracker] = trackersCoreData.compactMap { coreDataTracker in
+                guard let id = coreDataTracker.id,
+                      let trackerTitle = coreDataTracker.title,
+                      let color = coreDataTracker.color,
+                      let emoji = coreDataTracker.emoji
+                else {
+                    print("⚠️ \(categoryTitle) Пропущена категория из-за отсутствия обязательных данных")
+                    return nil
+                }
+                
+                let scheduleData = coreDataTracker.schedule ?? Data()
+                let schedule = (try? JSONDecoder().decode([Weekday].self, from: scheduleData)) ?? []
+                
+                return Tracker(id: id, title: trackerTitle, color: color, emoji: emoji, schedule: schedule)
+            }
+            
+            return TrackerCategory(title: categoryTitle, items: trackers)
         }
+        
+        return refinedCategories
     }
 }
 

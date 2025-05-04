@@ -55,8 +55,7 @@ final class TrackerStore: NSObject {
             guard let id = coreDataObject.id,
                   let title = coreDataObject.title,
                   let color = coreDataObject.color,
-                  let emoji = coreDataObject.emoji,
-                  let category = coreDataObject.category?.title
+                  let emoji = coreDataObject.emoji
             else {
                 assertionFailure("⚠️ (fetchTrackers) Пропущен трекер из-за отсутствия обязательных данных")
                 return nil

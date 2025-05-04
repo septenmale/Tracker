@@ -72,14 +72,16 @@ final class TrackerCategoryStore: NSObject {
     func fetchAllCategories() -> [TrackerCategory] {
         guard let fetchedCategories = fetchedResultsController.fetchedObjects else { return [] }
         
-        let refinedCategories: [TrackerCategory] = fetchedCategories.compactMap { coreDataCategory in
+        let categoriesSwift: [TrackerCategory] = fetchedCategories.compactMap { coreDataCategory in
             guard let categoryTitle = coreDataCategory.title else {
                 assertionFailure("⚠️ fetchAllCategories: Пропущена категория без названия")
                 return nil
             }
-            let trackersCoreData = coreDataCategory.trackers as? Set<TrackerCoreData> ?? []
+            let trackersCoreData = (coreDataCategory.trackers as? Set<TrackerCoreData> ?? []).sorted {
+                ($0.title ?? "") < ($1.title ?? "")
+            }
             
-            let trackers: [Tracker] = trackersCoreData.compactMap { coreDataTracker in
+            let trackersSwift: [Tracker] = trackersCoreData.compactMap { coreDataTracker in
                 guard let id = coreDataTracker.id,
                       let trackerTitle = coreDataTracker.title,
                       let color = coreDataTracker.color,
@@ -95,10 +97,10 @@ final class TrackerCategoryStore: NSObject {
                 return Tracker(id: id, title: trackerTitle, color: color, emoji: emoji, schedule: schedule)
             }
             
-            return TrackerCategory(title: categoryTitle, items: trackers)
+            return TrackerCategory(title: categoryTitle, items: trackersSwift)
         }
         
-        return refinedCategories
+        return categoriesSwift
     }
 }
 

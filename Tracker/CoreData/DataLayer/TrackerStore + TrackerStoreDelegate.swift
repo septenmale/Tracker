@@ -17,9 +17,8 @@ final class TrackerStore: NSObject {
         super.init()
         do {
             try fetchedResultsController.performFetch()
-            print("✅ (init) NSFetchedResultsController загружен успешно!")
         } catch {
-            print("❌ (init) Ошибка загрузки FRC: \(error.localizedDescription)")
+            assertionFailure("❌TrackerStore init Ошибка загрузки FRC: \(error.localizedDescription)")
         }
     }
     
@@ -48,11 +47,9 @@ final class TrackerStore: NSObject {
     
     func fetchTrackers() -> [Tracker] {
         guard let fetchedObjects = fetchedResultsController.fetchedObjects else {
-            print("❌ (fetchTrackers) Ошибка: нет объектов в FRC!")
+            assertionFailure("❌ (fetchTrackers) Ошибка: нет объектов в FRC!")
             return []
         }
-        
-        print("🛠 (fetchTrackers) Загружено трекеров из Core Data: \(fetchedObjects.count)")
         
         return fetchedObjects.compactMap { coreDataObject in
             guard let id = coreDataObject.id,
@@ -61,14 +58,12 @@ final class TrackerStore: NSObject {
                   let emoji = coreDataObject.emoji,
                   let category = coreDataObject.category?.title
             else {
-                print("⚠️ (fetchTrackers) Пропущен трекер из-за отсутствия обязательных данных")
+                assertionFailure("⚠️ (fetchTrackers) Пропущен трекер из-за отсутствия обязательных данных")
                 return nil
             }
             
             let scheduleData = coreDataObject.schedule ?? Data()
             let schedule = (try? JSONDecoder().decode([Weekday].self, from: scheduleData)) ?? []
-            
-            print("✅ (fetchTrackers) Загружен трекер: \(title), ID: \(id), Расписание: \(schedule), Категория: \(category)")
             
             return Tracker(id: id, title: title, color: color, emoji: emoji, schedule: schedule)
         }
@@ -98,11 +93,10 @@ final class TrackerStore: NSObject {
             trackerToBeSaved.category = fetchedCategory
             trackerToBeSaved.schedule = try? JSONEncoder().encode(tracker.schedule)
             
-            print("🛠 Добавляем трекер \(tracker.title) в категорию \(fetchedCategory.title ?? "Неизвестно")")
             CoreDataManager.shared.saveContext()
             
         } catch {
-            print("❌ Ошибка при добавлении трекера: \(error.localizedDescription)")
+            assertionFailure("❌ addTracker: Ошибка при добавлении трекера: \(error.localizedDescription)")
         }
     }
 }

@@ -27,7 +27,7 @@ final class CategoryViewController: UIViewController {
         bind()
         setupUI()
     }
-    // Проставил так, но при закрытии/открытии экрана выделение пропадает. Баг ?
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         tableView.visibleCells.forEach { $0.accessoryType = .none }
@@ -179,10 +179,3 @@ extension CategoryViewController: UITableViewDataSource {
         return cell
     }
 }
-
-//@available(iOS 17, *)
-//#Preview {
-//    let model = TrackerCategoryStore()
-//    let viewModel = TrackerCategoryViewModel(model: model)
-//    CategoryViewController(viewModel: viewModel)
-//}

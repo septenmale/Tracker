@@ -40,9 +40,8 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         super.init()
         do {
             try fetchedResultsController.performFetch()
-            print("✅ FRC успешно загружен при инициализации!")
         } catch {
-            print("❌ Ошибка загрузки FRC: \(error.localizedDescription)")
+            assertionFailure("❌ Ошибка загрузки FRC: \(error.localizedDescription)")
         }
     }
     
@@ -55,9 +54,8 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         fetchedResultsController.fetchRequest.predicate = predicate
         do {
             try fetchedResultsController.performFetch()
-            print("✅ FRC обновлен для даты: \(startOfDay)")
         } catch {
-            print("❌ Ошибка обновления FRC: \(error.localizedDescription)")
+            assertionFailure("❌ Ошибка обновления FRC: \(error.localizedDescription)")
         }
     }
     
@@ -79,10 +77,10 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
                 // Устанавливаем связь (так как связь теперь "to one")
                 recordToBeSaved.trackers = tracker
             } else {
-                print("⚠️ Не найден трекер с id \(record.id)")
+                assertionFailure("⚠️ addRecord: Не найден трекер с id \(record.id)")
             }
         } catch {
-            print("❌ Ошибка при поиске трекера: \(error.localizedDescription)")
+            assertionFailure("❌ Ошибка при поиске трекера: \(error.localizedDescription)")
         }
         
         CoreDataManager.shared.saveContext()
@@ -100,7 +98,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
             recordsToDelete.forEach { context.delete($0) }
             CoreDataManager.shared.saveContext()
         } catch {
-            print("❌ Ошибка удаления записи: \(error.localizedDescription)")
+            assertionFailure("❌ Ошибка удаления записи: \(error.localizedDescription)")
         }
     }
     
@@ -111,13 +109,12 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
             let records = try context.fetch(fetchRequest)
             return records.count
         } catch {
-            print("❌ Ошибка получения количества дней для трекера: \(error.localizedDescription)")
+            assertionFailure("❌ Ошибка получения количества дней для трекера: \(error.localizedDescription)")
             return 0
         }
     }
     
     // MARK: - NSFetchedResultsControllerDelegate
-    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         // Уведомляем делегата, что данные обновились (например, чтобы обновить UI)
         delegate?.didUpdateRecords()

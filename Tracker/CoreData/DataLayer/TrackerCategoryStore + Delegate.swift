@@ -74,7 +74,7 @@ final class TrackerCategoryStore: NSObject {
         
         let refinedCategories: [TrackerCategory] = fetchedCategories.compactMap { coreDataCategory in
             guard let categoryTitle = coreDataCategory.title else {
-                print("⚠️ Пропущена категория без названия")
+                assertionFailure("⚠️ fetchAllCategories: Пропущена категория без названия")
                 return nil
             }
             let trackersCoreData = coreDataCategory.trackers as? Set<TrackerCoreData> ?? []
@@ -85,7 +85,7 @@ final class TrackerCategoryStore: NSObject {
                       let color = coreDataTracker.color,
                       let emoji = coreDataTracker.emoji
                 else {
-                    print("⚠️ \(categoryTitle) Пропущена категория из-за отсутствия обязательных данных")
+                    assertionFailure("⚠️ fetchAllCategories: \(categoryTitle) Пропущена категория из-за отсутствия обязательных данных")
                     return nil
                 }
                 

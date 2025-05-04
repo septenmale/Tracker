@@ -18,33 +18,21 @@ final class TrackersViewModel {
     private let trackerStore = TrackerStore()
     private let recordStore = TrackerRecordStore()
     private let categoryStore = TrackerCategoryStore.shared
-    //TODO: Тут обьединить получение всех категорий и трекером и приготовить готовый для отображение обьект.           Заменить получение trackerStore.fetchTrackers() на метод fetchAllCategories
+    //TODO: Проблема с фильрацией. Каждый раз при показе появляются в разной последовательности.
     func getTrackers(for date: Date) -> [TrackerCategory] {
-        // Обновляем выборку записей для выбранной даты
         recordStore.updateFetchRequest(for: date)
         
-        // Получаем записи (TrackerRecordCoreData) для выбранной даты
         guard let recordsForDate = recordStore.fetchedResultsController.fetchedObjects else {
-            print("⚠️ Нет записей для даты \(date)")
+            assertionFailure("⚠️ getTrackers: Нет записей для даты \(date)")
             return []
         }
         
-        // Собираем идентификаторы трекеров, которые отмечены именно на выбранную дату
         let completedIDsForDate = recordsForDate.compactMap { record in
             return record.trackers?.id
         }
-        
         let allCategories = categoryStore.fetchAllCategories()
-        
-        // Определяем день недели для выбранной даты (например, .monday, .tuesday, …)
         let dayOfWeek = weekdayFromDate(date)
         
-        // Фильтруем трекеры по следующей логике:
-        // Для нерегулярных событий (если schedule пустой):
-        //   - Если событие никогда не отмечалось (общий счёт == 0), показываем его во все дни.
-        //   - Если событие уже отмечалось, показываем его только, если оно отмечено на выбранную дату.
-        // Для привычек (если schedule не пустой):
-        //   - Показываем трекер только, если выбранный день содержится в его расписании.
         let filteredCategories: [TrackerCategory] = allCategories.compactMap { category in
             let visibleTrackers = category.items.filter { tracker in
                 if tracker.schedule.isEmpty {
@@ -87,7 +75,6 @@ final class TrackersViewModel {
     func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
         let day = Calendar.current.startOfDay(for: date)
         let newRecord = TrackerRecord(id: tracker.id, date: day)
-        print("📝 Отмечаем '\(tracker.title)' выполненным на \(day)")
         recordStore.addRecord(newRecord)
         DispatchQueue.main.async {
             self.delegate?.didUpdateTrackers()
@@ -96,7 +83,6 @@ final class TrackersViewModel {
     
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
         let day = Calendar.current.startOfDay(for: date)
-        print("🔄 Снимаем отметку с '\(tracker.title)' на \(day)")
         // Передаем идентификатор трекера, чтобы удалить запись, связанную с этим трекером на выбранную дату
         recordStore.deleteRecord(id: tracker.id, date: day)
         DispatchQueue.main.async {

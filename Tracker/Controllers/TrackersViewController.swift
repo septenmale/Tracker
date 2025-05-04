@@ -99,7 +99,6 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         filteredTrackers = viewModel.getTrackers(for: date)
         collectionView.reloadData()
         setupUIBasedOnData()
-        
     }
     
     private func addNavItems() {

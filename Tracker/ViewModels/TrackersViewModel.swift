@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// Этот протокол для обновления UI в TrackerVC
+
 protocol TrackersViewModelDelegate: AnyObject {
     func didUpdateTrackers()
 }
@@ -18,7 +18,7 @@ final class TrackersViewModel {
     private let trackerStore = TrackerStore()
     private let recordStore = TrackerRecordStore()
     private let categoryStore = TrackerCategoryStore.shared
-    //TODO: Проблема с фильрацией. Каждый раз при показе появляются в разной последовательности.
+    
     func getTrackers(for date: Date) -> [TrackerCategory] {
         recordStore.updateFetchRequest(for: date)
         
@@ -55,7 +55,6 @@ final class TrackersViewModel {
         return filteredCategories
     }
     
-    // Вспомогательный метод для определения дня недели из даты
     private func weekdayFromDate(_ date: Date) -> Weekday {
         let idx = Calendar.current.component(.weekday, from: date)
         switch idx {
@@ -70,8 +69,6 @@ final class TrackersViewModel {
         }
     }
     
-    // MARK: - Методы отметки выполнения трекера
-    
     func markTrackerAsCompleted(_ tracker: Tracker, on date: Date) {
         let day = Calendar.current.startOfDay(for: date)
         let newRecord = TrackerRecord(id: tracker.id, date: day)
@@ -83,7 +80,6 @@ final class TrackersViewModel {
     
     func markTrackerAsInProgress(_ tracker: Tracker, on date: Date) {
         let day = Calendar.current.startOfDay(for: date)
-        // Передаем идентификатор трекера, чтобы удалить запись, связанную с этим трекером на выбранную дату
         recordStore.deleteRecord(id: tracker.id, date: day)
         DispatchQueue.main.async {
             self.delegate?.didUpdateTrackers()
@@ -91,16 +87,14 @@ final class TrackersViewModel {
     }
     
     func isTrackerCompleted(_ tracker: Tracker, on date: Date) -> Bool {
-        // Обновляем выборку для заданной даты
         recordStore.updateFetchRequest(for: date)
-        // Получаем записи для выбранной даты
         guard let records = recordStore.fetchedResultsController.fetchedObjects else {
             return false
         }
-        // Если хотя бы одна запись связана с данным трекером, считаем его выполненным
+        
         return records.contains { $0.trackers?.id == tracker.id }
     }
-    // Разобраться с "let weekdays"
+    // Возможно стоит воспользоваться методом "weekdayFromData"
     func addTracker(title: String, schedule: [Int], emoji: String, color: UIColor, category: String) {
         let weekdays: [Weekday] = schedule.compactMap { index in
             switch index {
@@ -118,12 +112,10 @@ final class TrackersViewModel {
         trackerStore.addTracker(newTracker, category)
     }
     
-    // MARK: - Получение количества дней, когда трекер был выполнен
     func getDaysAmount(_ tracker: Tracker) -> Int {
         return recordStore.getDaysAmount(for: tracker.id)
     }
     
-    // Дополнительный метод для проверки существования трекера по id
     func verifyTracker(by id: UUID) -> Tracker? {
         return trackerStore.fetchTrackers().first { $0.id == id }
     }

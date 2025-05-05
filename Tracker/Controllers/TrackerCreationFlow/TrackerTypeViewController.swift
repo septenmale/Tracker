@@ -8,7 +8,6 @@
 import UIKit
 
 final class TrackerTypeViewController: UIViewController {
-    // Обьявить модель и привязать ее к вью модели
     private let categoryModel = TrackerCategoryStore.shared
     private lazy var categoryViewModel = TrackerCategoryViewModel(model: categoryModel)
     private lazy var categoryVC = CategoryViewController(viewModel: categoryViewModel)

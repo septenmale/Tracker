@@ -101,7 +101,7 @@ extension NewCategoryViewController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
-    // TODO: Добавить проверку на пробелы 
+    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }

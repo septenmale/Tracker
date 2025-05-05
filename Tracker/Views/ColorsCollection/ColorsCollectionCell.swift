@@ -10,7 +10,7 @@ import UIKit
 final class ColorsCollectionCell: UICollectionViewCell {
     
     static let reuseIdentifier = "ColorsCollectionCell"
-    // TODO: можно убрать лишний слой и сделать через content view
+    
     let colorLabel: UILabel = {
         let label = UILabel()
         label.layer.cornerRadius = 8

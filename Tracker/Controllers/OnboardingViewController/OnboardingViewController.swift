@@ -124,8 +124,3 @@ extension OnboardingViewController: UIPageViewControllerDelegate {
         }
     }
 }
-
-@available(iOS 17, *)
-#Preview {
-    OnboardingViewController()
-}

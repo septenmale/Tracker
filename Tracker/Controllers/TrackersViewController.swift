@@ -88,7 +88,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         trackerTypeViewController.newTrackerDelegate = self
         present(trackerTypeViewController, animated: true)
     }
-    // TODO: add picked date logic
+    
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         let chosenDate = sender.date
         selectedDate = Calendar.current.startOfDay(for: chosenDate)

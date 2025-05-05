@@ -77,7 +77,6 @@ extension ColorsCollectionView: UICollectionViewDataSource {
 extension ColorsCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // TODO: убрать выделение для предидущего
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionCell else { return }
         
         selectedCell.layer.borderWidth = 3

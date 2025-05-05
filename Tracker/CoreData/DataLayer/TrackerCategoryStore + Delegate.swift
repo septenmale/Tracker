@@ -7,8 +7,6 @@
 
 import CoreData
 
-// Модель с которой связана ViewModel. Модель не знает про конкретную ViewModel
-
 protocol TrackerCategoryStoreDelegate: AnyObject {
     func didUpdateCategories()
 }

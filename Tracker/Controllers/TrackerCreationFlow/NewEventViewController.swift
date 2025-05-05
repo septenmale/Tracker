@@ -244,7 +244,6 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
         
         let categoryName = items[0].1
         
-        // TODO: Передать название категории как параметр
         viewModel.addTracker(title: eventName, schedule: [], emoji: selectedEmoji, color: selectedColor, category: categoryName)
 
         newTrackerDelegate?.didCreateNewTracker()

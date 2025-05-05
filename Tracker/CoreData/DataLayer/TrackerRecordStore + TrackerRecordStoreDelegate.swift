@@ -12,7 +12,6 @@ protocol TrackerRecordStoreDelegate: AnyObject {
 }
 
 final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
-    
     weak var delegate: TrackerRecordStoreDelegate?
     private let context: NSManagedObjectContext
     
@@ -45,8 +44,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    // MARK: - Обновление выборки по дате
-    
     /// Обновляет предикат выборки FRC для выбранной даты
     func updateFetchRequest(for date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
@@ -59,22 +56,17 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    // MARK: - Методы для добавления и удаления записей
-    
     /// Добавляет новую запись для трекера
     func addRecord(_ record: TrackerRecord) {
-        // Создаем новую запись TrackerRecordCoreData
         let recordToBeSaved = TrackerRecordCoreData(context: context)
-        recordToBeSaved.id = UUID()  // Или record.id, если требуется сохранять оригинальный id
+        recordToBeSaved.id = UUID()
         recordToBeSaved.date = Calendar.current.startOfDay(for: record.date)
         
-        // Находим соответствующий TrackerCoreData по record.id
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %@", record.id as CVarArg)
         
         do {
             if let tracker = try context.fetch(fetchRequest).first {
-                // Устанавливаем связь (так как связь теперь "to one")
                 recordToBeSaved.trackers = tracker
             } else {
                 assertionFailure("⚠️ addRecord: Не найден трекер с id \(record.id)")
@@ -90,7 +82,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     func deleteRecord(id trackerID: UUID, date: Date) {
         let startOfDay = Calendar.current.startOfDay(for: date)
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        // Используем tracker's id для поиска записи
+        
         fetchRequest.predicate = NSPredicate(format: "trackers.id == %@ AND date == %@", trackerID as CVarArg, startOfDay as NSDate)
         
         do {
@@ -116,8 +108,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     
     // MARK: - NSFetchedResultsControllerDelegate
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        // Уведомляем делегата, что данные обновились (например, чтобы обновить UI)
         delegate?.didUpdateRecords()
     }
-    
 }

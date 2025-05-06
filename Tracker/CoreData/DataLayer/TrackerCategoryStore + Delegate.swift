@@ -16,17 +16,6 @@ final class TrackerCategoryStore: NSObject {
     weak var delegate: TrackerCategoryStoreDelegate?
     private let context: NSManagedObjectContext
     
-    convenience override init() {
-        let context = CoreDataManager.shared.context
-        self.init(context: context)
-    }
-    
-    init(context: NSManagedObjectContext) {
-        self.context = context
-        super.init()
-        _ = fetchedResultsController
-    }
-    
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
@@ -47,6 +36,17 @@ final class TrackerCategoryStore: NSObject {
         }
         return frc
     }()
+    
+    private convenience override init() {
+        let context = CoreDataManager.shared.context
+        self.init(context: context)
+    }
+    
+    private init(context: NSManagedObjectContext) {
+        self.context = context
+        super.init()
+        _ = fetchedResultsController
+    }
     
     func saveCategory(_ category: TrackerCategory) {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()

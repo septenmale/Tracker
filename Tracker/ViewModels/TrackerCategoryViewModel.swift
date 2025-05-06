@@ -27,7 +27,7 @@ final class TrackerCategoryViewModel {
         model.saveCategory(category)
     }
     
-    func showAllTitles() -> [String] {
+    func getAllTitles() -> [String] {
         let models = model.fetchAllCategories()
         return models.map { $0.title }
     }

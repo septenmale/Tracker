@@ -7,24 +7,8 @@
 
 import UIKit
 
-class NewCategoryViewController: UIViewController {
+final class NewCategoryViewController: UIViewController {
     private let viewModel: TrackerCategoryViewModel
-    
-    init(viewModel: TrackerCategoryViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        textField.delegate = self
-        setupUI()
-    }
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -60,6 +44,22 @@ class NewCategoryViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    init(viewModel: TrackerCategoryViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        textField.delegate = self
+        setupUI()
+    }
     
     @objc
     private func submitButtonDidTap() {

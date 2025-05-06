@@ -39,11 +39,7 @@ final class TrackersViewModel {
                     let totalCompletionCount = recordStore.getDaysAmount(for: tracker.id)
                     let isCompletedToday = completedIDsForDate.contains(tracker.id)
                     
-                    if totalCompletionCount == 0 {
-                        return true
-                    } else {
-                        return isCompletedToday
-                    }
+                    return totalCompletionCount == 0 ? true : isCompletedToday
                 } else {
                     return tracker.schedule.contains(dayOfWeek)
                 }

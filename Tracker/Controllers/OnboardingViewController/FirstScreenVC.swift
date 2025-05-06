@@ -1,5 +1,5 @@
 //
-//  secondScreenVC.swift
+//  OnboardingVC.swift
 //  Tracker
 //
 //  Created by Viktor Zavhorodnii on 24/04/2025.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class secondScreenVC: UIViewController {
+final class FirstScreenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -15,7 +15,7 @@ final class secondScreenVC: UIViewController {
     
     private let bgImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "secondScreenBG")
+        imageView.image = UIImage(resource: .firstScreenBG)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -26,7 +26,7 @@ final class secondScreenVC: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32, weight: .bold)
         label.textColor = .black
-        label.text = "Даже если это\nне литры воды и йога"
+        label.text = "Отслеживайте только\n то, что хотите"
         label.numberOfLines = 2
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -48,9 +48,4 @@ final class secondScreenVC: UIViewController {
             
         ])
     }
-}
-
-@available(iOS 17, *)
-#Preview {
-    secondScreenVC()
 }

@@ -32,8 +32,8 @@ final class OnboardingViewController: UIPageViewController {
     }
     
     private lazy var pages: [UIViewController] = {
-        let first = firstScreenVC()
-        let second = secondScreenVC()
+        let first = FirstScreenVC()
+        let second = SecondScreenVC()
         
         return [first, second]
     }()

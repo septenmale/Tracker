@@ -12,31 +12,10 @@ protocol CategoryViewControllerDelegate: AnyObject {
 }
 
 final class CategoryViewController: UIViewController {
-    init(viewModel: TrackerCategoryViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        bind()
-        setupUI()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        tableView.visibleCells.forEach { $0.accessoryType = .none }
-    }
-
     weak var delegate: CategoryViewControllerDelegate?
     private let viewModel: TrackerCategoryViewModel
     private var titles: [String] {
-        viewModel.showAllTitles()
+        viewModel.getAllTitles()
     }
     
     private lazy var tableView: UITableView = {
@@ -100,6 +79,27 @@ final class CategoryViewController: UIViewController {
         return button
     }()
     
+    init(viewModel: TrackerCategoryViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        bind()
+        setupUI()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        tableView.visibleCells.forEach { $0.accessoryType = .none }
+    }
+    
     @objc
     private func addCategoryButtonDidTap() {
         let newCategoryVC = NewCategoryViewController(viewModel: viewModel)
@@ -151,13 +151,13 @@ extension CategoryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.layer.cornerRadius = 16
+        cell.layer.masksToBounds = true
+        
         if indexPath.row == titles.count - 1 {
             cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
-            cell.layer.cornerRadius = 16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         } else if indexPath.row == 0 {
-            cell.layer.cornerRadius = 16
-            cell.layer.masksToBounds = true
             cell.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         }
     }

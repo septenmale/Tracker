@@ -34,7 +34,7 @@ final class CoreDataManager {
                 try context.save()
             } catch {
                 context.rollback()
-                print("❌ Ошибка сохранения в Core Data: \(error.localizedDescription)")
+                assertionFailure("❌ Ошибка сохранения в Core Data: \(error.localizedDescription)")
             }
         }
     }

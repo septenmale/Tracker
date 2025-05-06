@@ -34,15 +34,15 @@ extension TrackersViewController: UICollectionViewDataSource {
         cell.changeStateClosure = { [weak self] trackerId in
             guard let self else { return }
             guard let tracker = self.viewModel.verifyTracker(by: trackerId) else { return }
-
+            
             let selectedDate = Calendar.current.startOfDay(for: datePicker.date)
             guard selectedDate <= currentDate else { return }
             
             if self.viewModel.isTrackerCompleted(tracker, on: selectedDate) {
-                    self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
-                } else {
-                    self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
-                }
+                self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
+            } else {
+                self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
+            }
             
             let updatedIsCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
             let updatedDaysCount = self.viewModel.getDaysAmount(tracker)

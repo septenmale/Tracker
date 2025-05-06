@@ -75,7 +75,6 @@ extension EmojiCollectionView: UICollectionViewDataSource {
 extension EmojiCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // TODO: убрать выделение для предидущего
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionCell else { return }
         
         selectedCell.contentView.backgroundColor = .tLightGrey

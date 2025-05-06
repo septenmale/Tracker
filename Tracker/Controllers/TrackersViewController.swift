@@ -26,7 +26,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     
     let viewModel = TrackersViewModel()
-    var filteredTrackers: [TrackerCategory] = [] //TODO: Move to VM
+    var filteredTrackers: [TrackerCategory] = []
     
     let params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     
@@ -80,7 +80,6 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }()
     
     func didUpdateTrackers() {
-        print("📢 (didUpdateTrackers) Трекеры обновлены, обновляем UI!")
         updateTrackers(for: selectedDate)
     }
     
@@ -89,21 +88,17 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         trackerTypeViewController.newTrackerDelegate = self
         present(trackerTypeViewController, animated: true)
     }
-    // TODO: add picked date logic
+    
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         let chosenDate = sender.date
         selectedDate = Calendar.current.startOfDay(for: chosenDate)
-        print("📅 DatePicker изменён: \(sender.date) -> \(selectedDate)")
         updateTrackers(for: selectedDate)
     }
     
     private func updateTrackers(for date: Date) {
-        print("🔄 updateTrackers() вызван для даты: \(date)")
         filteredTrackers = viewModel.getTrackers(for: date)
-        print("📂 После вызова getTrackers, количество: \(filteredTrackers.count)")
         collectionView.reloadData()
         setupUIBasedOnData()
-        
     }
     
     private func addNavItems() {
@@ -163,7 +158,7 @@ extension TrackersViewController: UISearchResultsUpdating {
         
     }
 }
-// TODO: похоже на дубль делегатом. Проверить так же TrackersViewModelDelegate второй скорее всего лишний
+
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateNewTracker() {
         updateTrackers(for: selectedDate)

@@ -8,6 +8,15 @@
 import UIKit
 
 final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate {
+    init(viewModel: TrackersViewModel, vc: CategoryViewController) {
+        self.viewModel = viewModel
+        self.categoryVC = vc
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -15,6 +24,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         textField.delegate = self
         emojiCollectionView.changeButtonStateDelegate = self
         colorsCollectionView.changeButtonStateDelegate = self
+        categoryVC.delegate = self
         
         setupElementsInScrollView()
         setupStackView()
@@ -24,16 +34,8 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     
     weak var newTrackerDelegate: NewTrackerDelegate?
     
+    private let categoryVC: CategoryViewController
     private let viewModel: TrackersViewModel
-    
-    init(viewModel: TrackersViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     private let emojiCollectionView = EmojiCollectionView()
     
@@ -148,31 +150,22 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     }
     
     func changeCreateButtonState() {
-        
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
         let isScheduleValid = !selectedDays.isEmpty
         let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
         let isColorSelected = colorsCollectionView.selectedColor != nil
-        
-        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected {
+        // Возможно вынести в отдельную функцию/переменную
+        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected && !selectedDays.isEmpty && items[0].1 != "" {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
             createButton.backgroundColor = .tGray
             createButton.isEnabled = false
         }
-        
     }
     
     @objc private  func createNewHabit() {
-        
-        guard let habitName = textField.text, !habitName.isEmpty else {
-            //TODO: Show alert
-            return
-        }
-        
-        guard !selectedDays.isEmpty else {
-            //TODO: Show alert
+        guard let habitName = textField.text else {
             return
         }
         
@@ -183,12 +176,13 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         guard let selectedColor = colorsCollectionView.selectedColor else {
             return
         }
-        // TODO: Не много ли 4 параметра, посмотреть можно ли переделать
-        viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor)
+        
+        let categoryName = items[0].1
+        
+        viewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor, category: categoryName)
         newTrackerDelegate?.didCreateNewTracker()
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)
-        
     }
     
     @objc private func backToTrackerTypeVC() {
@@ -214,7 +208,6 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
         tableView.dataSource = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.separatorStyle = .singleLine
-        tableView.separatorInset = UIEdgeInsets.zero
         tableView.layoutMargins = UIEdgeInsets.zero
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.layer.cornerRadius = 16
@@ -226,15 +219,12 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     }
     
     private func setupStackView() {
-        
         buttonStackView.addArrangedSubview(cancelButton)
         buttonStackView.addArrangedSubview(createButton)
     }
     
     private func setupConstraints() {
-        
         NSLayoutConstraint.activate([
-            
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 38),
             
@@ -254,7 +244,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
             textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 75),
-            // TODO: Проверять есть ли футер у textField если да сделать warningLabel футером
+            
             warningLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             warningLabel.topAnchor.constraint(equalTo: textField.bottomAnchor),
             
@@ -284,15 +274,11 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
             buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             buttonStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
             buttonStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4)
-                        
         ])
-        
     }
-    
 }
 
 extension NewHabitViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let tableHeight = tableView.bounds.height
         return tableHeight / CGFloat(items.count)
@@ -319,9 +305,10 @@ extension NewHabitViewController: UITableViewDelegate {
             }
             
             present(scheduleVC, animated: true)
+        } else if indexPath.row == 0 {
+            present(categoryVC, animated: true)
         }
     }
-    
 }
 
 extension NewHabitViewController: UITableViewDataSource {
@@ -352,7 +339,6 @@ extension NewHabitViewController: UITableViewDataSource {
 }
 
 extension NewHabitViewController : UITextFieldDelegate {
-    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let maxLength = 38
         let currentText = textField.text ?? ""
@@ -371,5 +357,12 @@ extension NewHabitViewController : UITextFieldDelegate {
         changeCreateButtonState()
         return true
     }
-    
+}
+
+extension NewHabitViewController: CategoryViewControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        items [0].1 = category
+        changeCreateButtonState()
+        tableView.reloadData()
+    }
 }

@@ -8,12 +8,15 @@
 import UIKit
 
 final class TrackerTypeViewController: UIViewController {
+    private let categoryModel = TrackerCategoryStore.shared
+    private lazy var categoryViewModel = TrackerCategoryViewModel(model: categoryModel)
+    private lazy var categoryVC = CategoryViewController(viewModel: categoryViewModel)
     
-    private let viewModel: TrackersViewModel
+    private let trackerViewModel: TrackersViewModel
     weak var newTrackerDelegate: NewTrackerDelegate?
     
     init(viewModel: TrackersViewModel) {
-        self.viewModel = viewModel
+        self.trackerViewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -52,7 +55,7 @@ final class TrackerTypeViewController: UIViewController {
         button.backgroundColor = .blackDay
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
-        button.addTarget(self, action: #selector(switchToHabbitController), for: .touchUpInside)
+        button.addTarget(self, action: #selector(switchToHabitController), for: .touchUpInside)
         return button
     }()
     
@@ -68,14 +71,14 @@ final class TrackerTypeViewController: UIViewController {
         return button
     }()
     
-    @objc private func switchToHabbitController() {
-        let newHabitViewController = NewHabitViewController(viewModel: self.viewModel)
+    @objc private func switchToHabitController() {
+        let newHabitViewController = NewHabitViewController(viewModel: self.trackerViewModel, vc: categoryVC)
         newHabitViewController.newTrackerDelegate = newTrackerDelegate
         present(newHabitViewController, animated: true)
     }
     
     @objc private func switchToEventController() {
-        let newEventViewController = NewEventViewController(viewModel: self.viewModel)
+        let newEventViewController = NewEventViewController(viewModel: self.trackerViewModel, vc: categoryVC)
         newEventViewController.newTrackerDelegate = newTrackerDelegate
         present(newEventViewController, animated: true)
     }
@@ -89,7 +92,6 @@ final class TrackerTypeViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        
         view.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -108,7 +110,5 @@ final class TrackerTypeViewController: UIViewController {
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-        
     }
-    
 }

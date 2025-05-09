@@ -28,7 +28,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     private let categoryVC: CategoryViewController
     private let tableView = UITableView(frame: .zero, style: .plain)
     private var items = [
-        ("Категория", "")
+        (NSLocalizedString("category", comment: ""), "")
     ]
     
     private let emojiCollectionView = EmojiCollectionView()
@@ -84,7 +84,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     
     private lazy var warningLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("textLengthWarningLabel", comment: "")
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .tRed
         label.isHidden = true
@@ -95,7 +95,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("createButtonTitle", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .tGray
         button.layer.cornerRadius = 16
@@ -108,7 +108,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancelButtonTitle", comment: ""), for: .normal)
         button.setTitleColor(.tRed, for: .normal)
         button.backgroundColor = .white
         button.layer.borderWidth = 1

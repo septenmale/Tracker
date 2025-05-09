@@ -1,0 +1,44 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Viktor Zavhorodnii on 09/05/2025.
+  
+*/
+
+"firstOnbTitle" = "Отслеживайте только то, что хотите";
+"secondOnbTitle" = "Даже если это не литры воды и йога";
+"onbButton" = "Вот это технологии !";
+"searchControllerText" = "Поиск";
+"mainScreenPlaceHolder" = "Что будем отслеживать?";
+"trackerCreationTitle" = "Создание трекера";
+"habitButtonTitle" = "Привычка";
+"unregularEventButtonTitle" = "Нерегулярное событие";
+"newHabitTitle" = "Новая привычка";
+"newHabitTextFieldPlaceholder" = "Введите название трекера";
+"category" = "Категория";
+"schedule" = "Расписание";
+"colorTitle" = "Цвет";
+"cancelButtonTitle" = "Отменить";
+"createButtonTitle" = "Создать";
+"newCategoryPlacegolder" = "Привычки и события можно\nобъединить по смыслу";
+"addCategoryButtonTitle" = "Добавить категорию";
+"newCategoryTitle" = "Новая категория";
+"newCategoryTextFieldPlaceholder" = "Введите название категории";
+"confirmButtonTitle" = "Готово";
+"textLengthWarningLabel" = "Ограничение 38 символов";
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда";
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
+"everyDaySubtitle" = "каждый день";
+"mondayShort" = "Пн";
+"tuesdayShort" = "Вт";
+"wednesdayShort" = "Ср";
+"thursdayShort" = "Чт";
+"fridayShort" = "Пт";
+"saturdayShort" = "Сб";
+"sundayShort" = "Вс";

@@ -33,7 +33,7 @@ final class CategoryViewController: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Категория"
+        label.text = NSLocalizedString("category", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -58,7 +58,7 @@ final class CategoryViewController: UIViewController {
     
     private let stubLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно\nобъединить по смыслу"
+        label.text = NSLocalizedString("newCategoryPlacegolder", comment: "")
         label.numberOfLines = 2
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 12, weight: .medium)
@@ -68,7 +68,7 @@ final class CategoryViewController: UIViewController {
     
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton()
-        button.setTitle( "Добавить категорию", for: .normal)
+        button.setTitle(NSLocalizedString("addCategoryButtonTitle", comment: ""), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.backgroundColor = .black

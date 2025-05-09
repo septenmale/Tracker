@@ -6,13 +6,13 @@
 //
 
 import UIKit
-
+//TODO: Кнопка готово активна если нету текста 
 final class NewCategoryViewController: UIViewController {
     private let viewModel: TrackerCategoryViewModel
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая категория"
+        label.text = NSLocalizedString("newCategoryTitle", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -21,7 +21,7 @@ final class NewCategoryViewController: UIViewController {
     
     private let textField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = NSLocalizedString("newCategoryTextFieldPlaceholder", comment: "")
         textField.backgroundColor = .tBackground
         textField.layer.cornerRadius = 16
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -34,7 +34,7 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var submitButton: UIButton = {
         let button = UIButton()
-        button.setTitle( "Готово", for: .normal)
+        button.setTitle(NSLocalizedString("confirmButtonTitle", comment: ""), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.backgroundColor = .tGray

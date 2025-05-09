@@ -39,7 +39,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         let searchController = UISearchController()
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.placeholder = "Поиск"
+        searchController.searchBar.placeholder = NSLocalizedString("searchControllerText", comment: "")
         return searchController
     }()
     
@@ -51,7 +51,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     
     private let stubLabelText: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = NSLocalizedString("mainScreenPlaceHolder", comment: "")
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return label
     }()

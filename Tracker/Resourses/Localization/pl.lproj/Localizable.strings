@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   Tracker
 
@@ -6,39 +6,39 @@
   
 */
 
-"firstOnbTitle" = "Отслеживайте только то, что хотите";
-"secondOnbTitle" = "Даже если это не литры воды и йога";
-"onbButton" = "Вот это технологии !";
-"searchControllerText" = "Поиск";
-"mainScreenPlaceHolder" = "Что будем отслеживать?";
-"trackerCreationTitle" = "Создание трекера";
-"habitButtonTitle" = "Привычка";
-"unregularEventButtonTitle" = "Нерегулярное событие";
-"newHabitTitle" = "Новая привычка";
-"newHabitTextFieldPlaceholder" = "Введите название трекера";
-"category" = "Категория";
-"schedule" = "Расписание";
-"colorTitle" = "Цвет";
-"cancelButtonTitle" = "Отменить";
-"createButtonTitle" = "Создать";
-"newCategoryPlacegolder" = "Привычки и события можно\nобъединить по смыслу";
-"addCategoryButtonTitle" = "Добавить категорию";
-"newCategoryTitle" = "Новая категория";
-"newCategoryTextFieldPlaceholder" = "Введите название категории";
-"confirmButtonTitle" = "Готово";
-"textLengthWarningLabel" = "Ограничение 38 символов";
-"monday" = "Понедельник";
-"tuesday" = "Вторник";
-"wednesday" = "Среда";
-"thursday" = "Четверг";
-"friday" = "Пятница";
-"saturday" = "Суббота";
-"sunday" = "Воскресенье";
-"everyDaySubtitle" = "каждый день";
-"mondayShort" = "Пн";
-"tuesdayShort" = "Вт";
-"wednesdayShort" = "Ср";
-"thursdayShort" = "Чт";
-"fridayShort" = "Пт";
-"saturdayShort" = "Сб";
-"sundayShort" = "Вс";
+"firstOnbTitle" = "Śledź tylko to, co chcesz";
+"secondOnbTitle" = "Nawet jeśli to nie litry wody i joga";
+"onbButton" = "To jest technologia!";
+"searchControllerText" = "Szukaj";
+"mainScreenPlaceHolder" = "Co będziemy śledzić?";
+"trackerCreationTitle" = "Tworzenie trackera";
+"habitButtonTitle" = "Nawyk";
+"unregularEventButtonTitle" = "Nieregularne zdarzenie";
+"newHabitTitle" = "Nowy nawyk";
+"newHabitTextFieldPlaceholder" = "Wprowadź nazwę trackera";
+"category" = "Kategoria";
+"schedule" = "Harmonogram";
+"colorTitle" = "Kolor";
+"cancelButtonTitle" = "Anuluj";
+"createButtonTitle" = "Utwórz";
+"newCategoryPlacegolder" = "Nawyki i zdarzenia można\npołączyć według znaczenia";
+"addCategoryButtonTitle" = "Dodaj kategorię";
+"newCategoryTitle" = "Nowa kategoria";
+"newCategoryTextFieldPlaceholder" = "Wprowadź nazwę kategorii";
+"confirmButtonTitle" = "Gotowe";
+"textLengthWarningLabel" = "Limit 38 znaków";
+"monday" = "Poniedziałek";
+"tuesday" = "Wtorek";
+"wednesday" = "Środa";
+"thursday" = "Czwartek";
+"friday" = "Piątek";
+"saturday" = "Sobota";
+"sunday" = "Niedziela";
+"everyDaySubtitle" = "każdego dnia";
+"mondayShort" = "Pn";
+"tuesdayShort" = "Wt";
+"wednesdayShort" = "Śr";
+"thursdayShort" = "Cz";
+"fridayShort" = "Pt";
+"saturdayShort" = "So";
+"sundayShort" = "Nd";

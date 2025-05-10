@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//TODO: Кнопка готово активна если нету текста 
+
 final class NewCategoryViewController: UIViewController {
     private let viewModel: TrackerCategoryViewModel
     
@@ -41,6 +41,7 @@ final class NewCategoryViewController: UIViewController {
         button.layer.cornerRadius = 16
         button.titleEdgeInsets = .init(top: 19, left: 8, bottom: 19, right: 8)
         button.addTarget(self, action: #selector(submitButtonDidTap), for: .touchUpInside)
+        button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()

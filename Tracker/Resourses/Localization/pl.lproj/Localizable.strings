@@ -6,8 +6,8 @@
   
 */
 
-"firstOnbTitle" = "Śledź tylko to, co chcesz";
-"secondOnbTitle" = "Nawet jeśli to nie litry wody i joga";
+"firstOnbTitle" = "Śledź tylko to\nco chcesz";
+"secondOnbTitle" = "Nawet jeśli to nie\nlitry wody i joga";
 "onbButton" = "To jest technologia!";
 "searchControllerText" = "Szukaj";
 "mainScreenPlaceHolder" = "Co będziemy śledzić?";

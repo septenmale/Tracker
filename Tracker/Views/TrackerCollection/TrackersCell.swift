@@ -45,7 +45,6 @@ final class TrackersCell: UICollectionViewCell {
     
     private let daysAmountLabel: UILabel = {
         let label = UILabel()
-        label.text = "1 день"
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -86,7 +85,10 @@ final class TrackersCell: UICollectionViewCell {
         let buttonImage = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
         addAsCompleteButton.setImage(UIImage(systemName: buttonImage), for: .normal)
         addAsCompleteButton.alpha = isCompleted ? 0.6 : 1
-        daysAmountLabel.text = "\(daysCount) \(daysCount == 1 ? "день" : "дней")"
+        daysAmountLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: ""),
+            daysCount
+        )
         emojiLabel.text = tracker.emoji
         titleLabel.text = tracker.title
         trackerContainerView.backgroundColor = tracker.color

@@ -8,7 +8,6 @@
 import UIKit
 
 final class TrackersCell: UICollectionViewCell {
-    
     static let reuseIdentifier = "TrackersCell"
     
     var changeStateClosure: ((UUID) -> Void)?
@@ -18,7 +17,7 @@ final class TrackersCell: UICollectionViewCell {
     private let trackerContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "Color selection 5")
-        view.layer.cornerRadius = 16
+        view.layer.cornerRadius = 14
         view.layer.masksToBounds = true
         return view
     }()
@@ -81,6 +80,13 @@ final class TrackersCell: UICollectionViewCell {
         changeStateClosure?(trackerId)
     }
     
+    func previewForContextMenu() -> UIViewController {
+        let previewController = UIViewController()
+        previewController.view = trackerContainerView.snapshotView(afterScreenUpdates: true) ?? UIView()
+        previewController.preferredContentSize = trackerContainerView.bounds.size
+        return previewController
+    }
+    
     func updateUI(isCompleted: Bool, daysCount: Int, tracker: Tracker) {
         let buttonImage = isCompleted ? "checkmark.circle.fill" : "plus.circle.fill"
         addAsCompleteButton.setImage(UIImage(systemName: buttonImage), for: .normal)
@@ -108,7 +114,6 @@ final class TrackersCell: UICollectionViewCell {
     }
     
     private func setupConstraints() {
-        
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -145,6 +150,4 @@ final class TrackersCell: UICollectionViewCell {
             
         ])
     }
-    
 }
-

@@ -165,3 +165,31 @@ extension TrackersViewController: NewTrackerDelegate {
         setupUIBasedOnData()
     }
 }
+
+// MARK: - Collection view delegate
+extension TrackersViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard indexPaths.count > 0 else { return nil }
+        let indexPath = indexPaths[0]
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackersCell else { return nil }
+        //TODO: Добавить локализацию
+        return UIContextMenuConfiguration(
+            previewProvider: {
+                return cell.previewForContextMenu()
+            },
+            actionProvider: { actions in
+                return UIMenu(children: [
+                    UIAction(title: "Закрепить") { _ in
+                        // Тут вероятнее всего добавляем в категорию "закрепленные"
+                            // Как добиться чтобы закрепленные были всегда с верху?
+                    },
+                    UIAction(title: "Редактировать") { _ in
+                        
+                    },
+                    UIAction(title: "Удалить", attributes: .destructive) { _ in
+                        
+                    },
+                ])
+            })
+    }
+}

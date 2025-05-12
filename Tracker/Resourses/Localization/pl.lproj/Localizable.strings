@@ -42,3 +42,8 @@
 "fridayShort" = "Pt";
 "saturdayShort" = "So";
 "sundayShort" = "Nd";
+"pinAction" = "Przypnij";
+"unpin" = "Odepnij";
+"editAction" = "Edytuj";
+"deleteAction" = "Usuń";
+"sureToDeleteTracker" = "Czy na pewno chcesz usunąć ten tracker?";

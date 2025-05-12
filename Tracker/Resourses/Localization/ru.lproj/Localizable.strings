@@ -5,9 +5,9 @@
   Created by Viktor Zavhorodnii on 09/05/2025.
   
 */
-
-"firstOnbTitle" = "Отслеживайте только то, что хотите";
-"secondOnbTitle" = "Даже если это не литры воды и йога";
+//TODO: добавить для "Новое нерегулярное событие", "Введите название трекера"
+"firstOnbTitle" = "Отслеживайте только\nто, что хотите";
+"secondOnbTitle" = "Даже если это\nне литры воды и йога";
 "onbButton" = "Вот это технологии !";
 "searchControllerText" = "Поиск";
 "mainScreenPlaceHolder" = "Что будем отслеживать?";
@@ -42,3 +42,8 @@
 "fridayShort" = "Пт";
 "saturdayShort" = "Сб";
 "sundayShort" = "Вс";
+"pinAction" = "Закрепить";
+"unpin" = "Открепить";
+"editAction" = "Редактировать";
+"deleteAction" = "Удалить";
+"sureToDeleteTracker" = "Уверены что хотите удалить трекер ?";

@@ -97,6 +97,19 @@ final class TrackerStore: NSObject {
             assertionFailure("❌ addTracker: Ошибка при добавлении трекера: \(error.localizedDescription)")
         }
     }
+    
+    func deleteTracker(withId id: UUID) {
+        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        fetchRequest.predicate = NSPredicate(format: "id = %@", id as CVarArg)
+        
+        do {
+            guard let trackerToDelete = try context.fetch(fetchRequest).first else { return }
+            context.delete(trackerToDelete)
+            try context.save()
+        } catch {
+            assertionFailure("❌ deleteTracker: Ошибка при удалении трекера: \(error.localizedDescription)")
+        }
+    }
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {

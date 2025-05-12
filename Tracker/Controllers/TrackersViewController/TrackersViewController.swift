@@ -166,7 +166,7 @@ extension TrackersViewController: NewTrackerDelegate {
     }
 }
 
-// MARK: - Collection view delegate
+// MARK: - CollectionView Delegate
 extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard indexPaths.count > 0 else { return nil }
@@ -179,17 +179,128 @@ extension TrackersViewController: UICollectionViewDelegate {
             },
             actionProvider: { actions in
                 return UIMenu(children: [
-                    UIAction(title: "Закрепить") { _ in
+                    UIAction(title: NSLocalizedString("pinAction", comment: "")) { _ in
                         // Тут вероятнее всего добавляем в категорию "закрепленные"
-                            // Как добиться чтобы закрепленные были всегда с верху?
+                        // Как добиться чтобы закрепленные были всегда с верху?
                     },
-                    UIAction(title: "Редактировать") { _ in
+                    UIAction(title: NSLocalizedString("editAction", comment: "")) { _ in
                         
                     },
-                    UIAction(title: "Удалить", attributes: .destructive) { _ in
+                    //TODO: Возможно вынести алерту и дейтсвия в отдельный метод ?
+                    UIAction(title: NSLocalizedString("deleteAction", comment: ""), attributes: .destructive) { _ in
+                        let alert = UIAlertController(
+                            title: NSLocalizedString("sureToDeleteTracker", comment: ""),
+                            message: "",
+                            preferredStyle: .actionSheet
+                        )
                         
+                        let deleteAction = UIAlertAction(title: NSLocalizedString("deleteAction", comment: ""), style: .destructive) { [weak self] _ in
+                            guard let self else { return }
+                            
+                            let tracker = self.filteredTrackers[indexPath.section].items[indexPath.item]
+                            self.viewModel.removeTracker(by: tracker.id)
+                        }
+                        let cancelAction = UIAlertAction(title: NSLocalizedString("cancelButtonTitle", comment: ""), style: .cancel)
+                        
+                        alert.addAction(deleteAction)
+                        alert.addAction(cancelAction)
+                        
+                        self.present(alert, animated: true)
                     },
                 ])
             })
+    }
+}
+
+// MARK: - CollectionView DataSource
+extension TrackersViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return filteredTrackers.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filteredTrackers[section].items.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersCell.reuseIdentifier, for: indexPath) as? TrackersCell
+        guard let cell else { return UICollectionViewCell() }
+        
+        let tracker = filteredTrackers[indexPath.section].items[indexPath.row]
+        let selectedDate = Calendar.current.startOfDay(for: datePicker.date)
+        let currentDate = Calendar.current.startOfDay(for: Date())
+        
+        let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
+        let daysCount = viewModel.getDaysAmount(tracker)
+        
+        cell.trackerId = tracker.id
+        cell.updateUI(isCompleted: isCompleted, daysCount: daysCount, tracker: tracker)
+        
+        cell.changeStateClosure = { [weak self] trackerId in
+            guard let self else { return }
+            guard let tracker = self.viewModel.verifyTracker(by: trackerId) else { return }
+            
+            let selectedDate = Calendar.current.startOfDay(for: datePicker.date)
+            guard selectedDate <= currentDate else { return }
+            
+            if self.viewModel.isTrackerCompleted(tracker, on: selectedDate) {
+                self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)
+            } else {
+                self.viewModel.markTrackerAsCompleted(tracker, on: selectedDate)
+            }
+            
+            let updatedIsCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
+            let updatedDaysCount = self.viewModel.getDaysAmount(tracker)
+            cell.updateUI(isCompleted: updatedIsCompleted, daysCount: updatedDaysCount, tracker: tracker)
+        }
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            assertionFailure("Unexpected element kind \(kind)")
+            return UICollectionReusableView()
+        }
+        
+        guard  let headerView = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: CollectionHeader.reuseIdentifier,
+            for: indexPath
+        ) as? CollectionHeader else {
+            assertionFailure("Failed to dequeue ColorsCollectionHeader")
+            return UICollectionReusableView()
+        }
+        
+        headerView.titleLabel.text = filteredTrackers[indexPath.section].title
+        return headerView
+        
+    }
+}
+
+// MARK: - CollectionView FlowLayoutDelegate
+extension TrackersViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        return CGSize(width: collectionView.bounds.width, height: 18)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let availableWidth = collectionView.frame.width - params.paddingWidth
+        let cellWidth =  availableWidth / CGFloat(params.cellCount)
+        return CGSize(width: cellWidth, height: 148)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 10, left: params.leftInset, bottom: 10, right: params.rightInset)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return params.cellSpacing
     }
 }

@@ -42,3 +42,8 @@
 "fridayShort" = "Fri";
 "saturdayShort" = "Sat";
 "sundayShort" = "Sun";
+"pinAction" = "Pin";
+"unpin" = "Unpin";
+"editAction" = "Edit";
+"deleteAction" = "Delete";
+"sureToDeleteTracker" = "Are you sure you want to delete this tracker?";

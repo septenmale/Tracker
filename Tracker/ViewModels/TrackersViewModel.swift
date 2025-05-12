@@ -12,12 +12,15 @@ protocol TrackersViewModelDelegate: AnyObject {
 }
 
 final class TrackersViewModel {
-    
     weak var delegate: TrackersViewModelDelegate?
     
     private let trackerStore = TrackerStore()
     private let recordStore = TrackerRecordStore()
     private let categoryStore = TrackerCategoryStore.shared
+    
+    init() {
+        trackerStore.delegate = self
+    }
     
     func getTrackers(for date: Date) -> [TrackerCategory] {
         recordStore.updateFetchRequest(for: date)
@@ -114,5 +117,15 @@ final class TrackersViewModel {
     
     func verifyTracker(by id: UUID) -> Tracker? {
         return trackerStore.fetchTrackers().first { $0.id == id }
+    }
+    
+    func removeTracker(by id: UUID) {
+        trackerStore.deleteTracker(withId: id)
+    }
+}
+
+extension TrackersViewModel: TrackerStoreDelegate {
+    func didUpdateTrackers() {
+        delegate?.didUpdateTrackers()
     }
 }

@@ -47,3 +47,6 @@
 "editAction" = "Редактировать";
 "deleteAction" = "Удалить";
 "sureToDeleteTracker" = "Уверены что хотите удалить трекер ?";
+//TODO: Добавить для других языков
+"editHabitTitle" = "Редактирование привычки";
+"editEventTitle" = "Редактирование события";

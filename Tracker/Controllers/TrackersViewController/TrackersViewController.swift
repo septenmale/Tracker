@@ -184,7 +184,12 @@ extension TrackersViewController: UICollectionViewDelegate {
                         // Как добиться чтобы закрепленные были всегда с верху?
                     },
                     UIAction(title: NSLocalizedString("editAction", comment: "")) { _ in
-                        
+//                     let categoryVM = TrackerCategoryViewModel(model: TrackerCategoryStore.shared)
+//                       let editVC = EditTrackerViewController(
+//                        tracker: tracker,
+//                        trackersViewModel: trackersViewModel,
+//                        categoryViewModel: trackerCategoryViewModel
+//                    )
                     },
                     //TODO: Возможно вынести алерту и дейтсвия в отдельный метод ?
                     UIAction(title: NSLocalizedString("deleteAction", comment: ""), attributes: .destructive) { _ in

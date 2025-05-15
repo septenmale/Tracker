@@ -8,7 +8,6 @@
 import UIKit
 
 final class ColorsCollectionView: UICollectionView {
-    
     weak var changeButtonStateDelegate: ChangeButtonStateDelegate?
     
     let colorsCollectionViewItems = TrackerColors.colors
@@ -35,11 +34,9 @@ final class ColorsCollectionView: UICollectionView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }
 
 extension ColorsCollectionView: UICollectionViewDataSource {
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         colorsCollectionViewItems.count
     }
@@ -50,7 +47,6 @@ extension ColorsCollectionView: UICollectionViewDataSource {
         
         let color = colorsCollectionViewItems[indexPath.item]
         cell.colorLabel.backgroundColor = color
-        
         
         if color == selectedColor {
             cell.layer.borderWidth = 3
@@ -84,11 +80,9 @@ extension ColorsCollectionView: UICollectionViewDataSource {
         return headerView
         
     }
-    
 }
 
 extension ColorsCollectionView: UICollectionViewDelegate {
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionCell else { return }
         
@@ -102,7 +96,6 @@ extension ColorsCollectionView: UICollectionViewDelegate {
         
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         
         guard let selectedCell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionCell else { return }
@@ -110,11 +103,9 @@ extension ColorsCollectionView: UICollectionViewDelegate {
         selectedCell.layer.borderWidth = 0
         
     }
-    
 }
 
 extension ColorsCollectionView: UICollectionViewDelegateFlowLayout {
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 0)
     }
@@ -138,5 +129,4 @@ extension ColorsCollectionView: UICollectionViewDelegateFlowLayout {
     ) -> CGSize {
         return CGSize(width: collectionView.bounds.width, height: 18)
     }
-    
 }

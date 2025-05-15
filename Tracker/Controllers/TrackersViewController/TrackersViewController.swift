@@ -27,6 +27,8 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     
     let viewModel = TrackersViewModel()
     let categoryViewModel = TrackerCategoryViewModel(model: TrackerCategoryStore.shared)
+    
+    // Возможно сделать computed и получать с VM через viewModel.getTrackers чтобы не хранить тут
     var filteredTrackers: [TrackerCategory] = []
     
     let params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
@@ -173,7 +175,7 @@ extension TrackersViewController: UICollectionViewDelegate {
         guard indexPaths.count > 0 else { return nil }
         let indexPath = indexPaths[0]
         guard let cell = collectionView.cellForItem(at: indexPath) as? TrackersCell else { return nil }
-        //TODO: Добавить локализацию
+        
         return UIContextMenuConfiguration(
             previewProvider: {
                 return cell.previewForContextMenu()
@@ -200,10 +202,10 @@ extension TrackersViewController: UICollectionViewDelegate {
                             trackersViewModel: self.viewModel,
                             categoryViewModel: self.categoryViewModel
                         )
-                        //
+                        
                         self.present(editVC, animated: true)
                     },
-                    //TODO: Возможно вынести алерту и дейтсвия в отдельный метод ?
+                    // Возможно вынести алерту и дейтсвия в отдельный метод ?
                     UIAction(title: NSLocalizedString("deleteAction", comment: ""), attributes: .destructive) { _ in
                         let alert = UIAlertController(
                             title: NSLocalizedString("sureToDeleteTracker", comment: ""),

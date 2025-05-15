@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// TODO: Возможно заполнения полей вынести в отдельный метод и ViewDidLoad
+
 final class EditTrackerViewController: UIViewController, ChangeButtonStateDelegate {
     init(
         data: EditableTrackerData,
@@ -29,6 +29,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         textField.delegate = self
+        categoryVC.delegate = self
         emojiCollectionView.changeButtonStateDelegate = self
         colorsCollectionView.changeButtonStateDelegate = self
         
@@ -38,8 +39,6 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         setupConstraints()
         updateData()
     }
-    
-    //    weak var newTrackerDelegate: NewTrackerDelegate?
     
     private let trackerViewModel: TrackersViewModel
     private let categoryViewModel: TrackerCategoryViewModel
@@ -115,16 +114,16 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         return label
     }()
     
-    private lazy var createButton: UIButton = {
+    private lazy var saveButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitle(NSLocalizedString("createButtonTitle", comment: ""), for: .normal)
+        button.setTitle(NSLocalizedString("saveButtonTitle", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .tGray
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = false
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(createNewHabit), for: .touchUpInside)
+        button.addTarget(self, action: #selector(editHabit), for: .touchUpInside)
         return button
     }()
     
@@ -208,37 +207,28 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
             isScheduleValid = true
         }
         if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected && items[0].1 != "" {
-            createButton.backgroundColor = .blackDay
-            createButton.isEnabled = true
+            saveButton.backgroundColor = .blackDay
+            saveButton.isEnabled = true
         } else {
-            createButton.backgroundColor = .tGray
-            createButton.isEnabled = false
+            saveButton.backgroundColor = .tGray
+            saveButton.isEnabled = false
         }
     }
-    //TODO: Добавить логику перезаписи. VC -> VM -> M
-    @objc private  func createNewHabit() {
-        guard let habitName = textField.text else {
-            return
-        }
-        
-        guard let selectedEmoji = emojiCollectionView.selectedEmoji else {
-            return
-        }
-        
-        guard let selectedColor = colorsCollectionView.selectedColor else {
-            return
-        }
-        
-        let categoryName = items[0].1
-        
-        trackerViewModel.addTracker(title: habitName, schedule: selectedDays, emoji: selectedEmoji, color: selectedColor, category: categoryName)
-        //        newTrackerDelegate?.didCreateNewTracker()
-        
-        presentingViewController?.presentingViewController?.dismiss(animated: true)
+    
+    @objc private  func editHabit() {
+        trackerViewModel.updateTracker(
+            id: data.tracker.id,
+            title: textField.text ?? "",
+            emoji: emojiCollectionView.selectedEmoji ?? data.tracker.emoji,
+            color: colorsCollectionView.selectedColor ?? data.tracker.color,
+            schedule: selectedDays,
+            category: items[0].1
+        )
+        dismiss(animated: true)
     }
-    //TODO: ДОбавить логику закрытия
+    
     @objc private func backToTrackerTypeVC() {
-        presentingViewController?.presentingViewController?.dismiss(animated: true)
+        dismiss(animated: true)
     }
     
     private func setupElementsInScrollView() {
@@ -253,7 +243,6 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         contentView.addSubview(emojiCollectionView)
         contentView.addSubview(colorsCollectionView)
         contentView.addSubview(buttonStackView)
-        
     }
     
     private func setupTableView() {
@@ -273,7 +262,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
     
     private func setupStackView() {
         buttonStackView.addArrangedSubview(cancelButton)
-        buttonStackView.addArrangedSubview(createButton)
+        buttonStackView.addArrangedSubview(saveButton)
     }
     
     private func setupConstraints() {
@@ -326,7 +315,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
             colorsCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
             colorsCollectionView.heightAnchor.constraint(equalToConstant: 204),
             
-            createButton.heightAnchor.constraint(equalToConstant: 60),
+            saveButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             
             buttonStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -398,7 +387,7 @@ extension EditTrackerViewController: UITableViewDataSource {
     
 }
 
-extension EditTrackerViewController : UITextFieldDelegate {
+extension EditTrackerViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let maxLength = 38
         let currentText = textField.text ?? ""
@@ -419,13 +408,21 @@ extension EditTrackerViewController : UITextFieldDelegate {
     }
 }
 
+extension EditTrackerViewController: CategoryViewControllerDelegate {
+    func didSelectCategory(_ category: String) {
+        items[0].1 = category
+        changeCreateButtonState()
+        tableView.reloadData()
+    }
+}
+
 @available(iOS 17.0, *)
 #Preview {
     let vm = TrackersViewModel()
     let store = TrackerCategoryStore.shared
     let catVM = TrackerCategoryViewModel(model: store)
     let vc = CategoryViewController(viewModel: catVM)
-    let tracker: Tracker = Tracker(id: UUID(), title: "TestTracker", color: .tBlue, emoji: "🍔", schedule: [])
+    let tracker: Tracker = Tracker(id: UUID(), title: "TestTracker", color: TrackerColors.colors[2], emoji: "🍔", schedule: [])
     let data: EditableTrackerData = EditableTrackerData(tracker: tracker, categoryTitle: "Новая категория", completedDays: 4)
     EditTrackerViewController(data: data, trackersViewModel: vm, categoryViewModel: catVM)
 }

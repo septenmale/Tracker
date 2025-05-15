@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import UIKit
 
 protocol TrackerStoreDelegate: AnyObject {
     func didUpdateTrackers()
@@ -108,6 +109,49 @@ final class TrackerStore: NSObject {
             try context.save()
         } catch {
             assertionFailure("❌ deleteTracker: Ошибка при удалении трекера: \(error.localizedDescription)")
+        }
+    }
+    
+    func updateTracker(
+        id: UUID,
+        title: String,
+        emoji: String,
+        color: UIColor,
+        schedule: [Weekday],
+        categoryTitle: String
+    ) {
+        let trackerFetch: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            guard let trackerToUpdate = try context.fetch(trackerFetch).first else {
+                assertionFailure("❌ updateTracker: Трекер с таким id не найден")
+                return
+            }
+            
+            // Обновляем поля
+            trackerToUpdate.title = title
+            trackerToUpdate.emoji = emoji
+            trackerToUpdate.color = color
+            trackerToUpdate.schedule = try? JSONEncoder().encode(schedule)
+            
+            // Находим или создаём категорию
+            let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            categoryFetch.predicate = NSPredicate(format: "title == %@", categoryTitle)
+            
+            let category: TrackerCategoryCoreData
+            if let foundCategory = try context.fetch(categoryFetch).first {
+                category = foundCategory
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = categoryTitle
+                category = newCategory
+            }
+            trackerToUpdate.category = category
+            
+            try context.save()
+        } catch {
+            assertionFailure("❌ updateTracker: Ошибка при обновлении — \(error.localizedDescription)")
         }
     }
 }

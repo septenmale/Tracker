@@ -54,6 +54,38 @@ final class TrackersViewModel {
         return filteredCategories
     }
     
+    func updateTracker(
+        id: UUID,
+        title: String,
+        emoji: String,
+        color: UIColor,
+        schedule: [Int],
+        category: String
+    ) {
+        let weekdays: [Weekday] = schedule.compactMap { index in
+            switch index {
+            case 0: return .monday
+            case 1: return .tuesday
+            case 2: return .wednesday
+            case 3: return .thursday
+            case 4: return .friday
+            case 5: return .saturday
+            case 6: return .sunday
+            default: return nil
+            }
+        }
+        
+        trackerStore.updateTracker(
+            id: id,
+            title: title,
+            emoji: emoji,
+            color: color,
+            schedule: weekdays,
+            categoryTitle: category
+        )
+        delegate?.didUpdateTrackers()
+    }
+    
     private func weekdayFromDate(_ date: Date) -> Weekday {
         let idx = Calendar.current.component(.weekday, from: date)
         switch idx {

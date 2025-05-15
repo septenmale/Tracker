@@ -26,6 +26,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     
     let viewModel = TrackersViewModel()
+    let categoryViewModel = TrackerCategoryViewModel(model: TrackerCategoryStore.shared)
     var filteredTrackers: [TrackerCategory] = []
     
     let params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
@@ -184,12 +185,23 @@ extension TrackersViewController: UICollectionViewDelegate {
                         // Как добиться чтобы закрепленные были всегда с верху?
                     },
                     UIAction(title: NSLocalizedString("editAction", comment: "")) { _ in
-//                     let categoryVM = TrackerCategoryViewModel(model: TrackerCategoryStore.shared)
-//                       let editVC = EditTrackerViewController(
-//                        tracker: tracker,
-//                        trackersViewModel: trackersViewModel,
-//                        categoryViewModel: trackerCategoryViewModel
-//                    )
+                        let tracker = self.filteredTrackers[indexPath.section].items[indexPath.row]
+                        let categoryTitle = self.filteredTrackers[indexPath.section].title
+                        let completedDays = self.viewModel.getDaysAmount(tracker)
+                        
+                        let editableData = EditableTrackerData(
+                            tracker: tracker,
+                            categoryTitle: categoryTitle,
+                            completedDays: completedDays,
+                        )
+                        
+                        let editVC = EditTrackerViewController(
+                            data: editableData,
+                            trackersViewModel: self.viewModel,
+                            categoryViewModel: self.categoryViewModel
+                        )
+                        //
+                        self.present(editVC, animated: true)
                     },
                     //TODO: Возможно вынести алерту и дейтсвия в отдельный метод ?
                     UIAction(title: NSLocalizedString("deleteAction", comment: ""), attributes: .destructive) { _ in

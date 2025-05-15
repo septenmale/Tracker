@@ -9,14 +9,17 @@ import UIKit
 // TODO: Возможно заполнения полей вынести в отдельный метод и ViewDidLoad
 final class EditTrackerViewController: UIViewController, ChangeButtonStateDelegate {
     init(
-        tracker: Tracker,
+        data: EditableTrackerData,
         trackersViewModel: TrackersViewModel,
         categoryViewModel: TrackerCategoryViewModel
     ) {
         self.trackerViewModel = trackersViewModel
         self.categoryViewModel = categoryViewModel
+        self.data = data
         super.init(nibName: nil, bundle: nil)
     }
+    
+    private let data: EditableTrackerData
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -33,9 +36,8 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         setupStackView()
         setupTableView()
         setupConstraints()
+        updateData()
     }
-    // to delete
-    let tracker: Tracker = Tracker(id: UUID(), title: "TestTracker", color: .tBlue, emoji: "🍔", schedule: [.friday,.tuesday])
     
     //    weak var newTrackerDelegate: NewTrackerDelegate?
     
@@ -45,7 +47,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
     
     private var selectedDays: [Int] = []
     private var isHabit: Bool {
-        !tracker.schedule.isEmpty
+        !data.tracker.schedule.isEmpty
     }
     private var tableViewHeightConstraint: NSLayoutConstraint?
     
@@ -70,10 +72,9 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         return label
     }()
     
-    private lazy var dayAmountLabel: UILabel = {
+    private lazy var daysAmountLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32, weight: .bold)
-        label.text = "5 дней" // Поправить на плюоризацию
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -92,8 +93,6 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
     
     private lazy var textField: UITextField = {
         let textField = UITextField()
-        //        textField.placeholder = NSLocalizedString("newHabitTextFieldPlaceholder", comment: "")
-        textField.text = tracker.title
         textField.backgroundColor = .tBackground
         textField.layer.cornerRadius = 16
         textField.layer.masksToBounds = false
@@ -153,6 +152,34 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         return stackView
     }()
     
+    private func updateData() {
+        textField.text = data.tracker.title
+        emojiCollectionView.selectedEmoji = data.tracker.emoji
+        colorsCollectionView.selectedColor = data.tracker.color
+        items[0].1 = data.categoryTitle
+        daysAmountLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: ""),
+            data.completedDays
+        )
+        if isHabit {
+            selectedDays = data.tracker.schedule.map {
+                switch $0 {
+                case .monday: return 0
+                case .tuesday: return 1
+                case .wednesday: return 2
+                case .thursday: return 3
+                case .friday: return 4
+                case .saturday: return 5
+                case .sunday: return 6
+                }
+            }
+            
+            updateScheduleSubtitle(selectedDays)
+        }
+        changeCreateButtonState()
+        tableView.reloadData()
+    }
+    
     private func updateScheduleSubtitle(_ selectedDays: [Int]) {
         let weekdaysShort = [NSLocalizedString("mondayShort", comment: ""), NSLocalizedString("tuesdayShort", comment: ""), NSLocalizedString("wednesdayShort", comment: ""), NSLocalizedString("thursdayShort", comment: ""), NSLocalizedString("fridayShort", comment: ""), NSLocalizedString("saturdayShort", comment: ""), NSLocalizedString("sundayShort", comment: "")]
         
@@ -173,11 +200,14 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
     
     func changeCreateButtonState() {
         let isTextFieldValid = !(textField.text?.isEmpty ?? true)
-        let isScheduleValid = !selectedDays.isEmpty
+        var isScheduleValid = !selectedDays.isEmpty
         let isEmojiSelected = emojiCollectionView.selectedEmoji != nil
         let isColorSelected = colorsCollectionView.selectedColor != nil
         // Возможно вынести в отдельную функцию/переменную
-        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected && !selectedDays.isEmpty && items[0].1 != "" {
+        if !isHabit {
+            isScheduleValid = true
+        }
+        if isTextFieldValid && isScheduleValid && isEmojiSelected && isColorSelected && items[0].1 != "" {
             createButton.backgroundColor = .blackDay
             createButton.isEnabled = true
         } else {
@@ -185,7 +215,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
             createButton.isEnabled = false
         }
     }
-    
+    //TODO: Добавить логику перезаписи. VC -> VM -> M
     @objc private  func createNewHabit() {
         guard let habitName = textField.text else {
             return
@@ -206,7 +236,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         
         presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
-    
+    //TODO: ДОбавить логику закрытия
     @objc private func backToTrackerTypeVC() {
         presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
@@ -216,7 +246,7 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        contentView.addSubview(dayAmountLabel)
+        contentView.addSubview(daysAmountLabel)
         contentView.addSubview(textField)
         contentView.addSubview(warningLabel)
         contentView.addSubview(tableView)
@@ -266,11 +296,11 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            dayAmountLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            dayAmountLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+            daysAmountLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            daysAmountLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
             
             textField.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            textField.topAnchor.constraint(equalTo: dayAmountLabel.bottomAnchor, constant: 40),
+            textField.topAnchor.constraint(equalTo: daysAmountLabel.bottomAnchor, constant: 40),
             textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 75),
@@ -395,6 +425,7 @@ extension EditTrackerViewController : UITextFieldDelegate {
     let store = TrackerCategoryStore.shared
     let catVM = TrackerCategoryViewModel(model: store)
     let vc = CategoryViewController(viewModel: catVM)
-    let tracker: Tracker = Tracker(id: UUID(), title: "TestTracker", color: .tBlue, emoji: "🍔", schedule: [.friday,.tuesday])
-    EditTrackerViewController(tracker: tracker, trackersViewModel: vm, categoryViewModel: catVM)
+    let tracker: Tracker = Tracker(id: UUID(), title: "TestTracker", color: .tBlue, emoji: "🍔", schedule: [])
+    let data: EditableTrackerData = EditableTrackerData(tracker: tracker, categoryTitle: "Новая категория", completedDays: 4)
+    EditTrackerViewController(data: data, trackersViewModel: vm, categoryViewModel: catVM)
 }

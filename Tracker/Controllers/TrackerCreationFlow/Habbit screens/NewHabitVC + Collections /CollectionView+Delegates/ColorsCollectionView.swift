@@ -11,11 +11,12 @@ final class ColorsCollectionView: UICollectionView {
     
     weak var changeButtonStateDelegate: ChangeButtonStateDelegate?
     
-    let colorsCollectionViewItems: [UIColor] = [
-        UIColor.collectionColor1,UIColor.collectionColor2,UIColor.collectionColor3,UIColor.collectionColor4,UIColor.collectionColor5,UIColor.collectionColor6,UIColor.collectionColor7,UIColor.collectionColor8,UIColor.collectionColor9,UIColor.collectionColor10,UIColor.collectionColor11,UIColor.collectionColor12,UIColor.collectionColor13,UIColor.collectionColor14,UIColor.collectionColor15,UIColor.collectionColor16,UIColor.collectionColor17,UIColor.collectionColor18
-    ]
-    
-    private(set) var selectedColor: UIColor?
+    let colorsCollectionViewItems = TrackerColors.colors
+    var selectedColor: UIColor? {
+        didSet {
+            reloadData()
+        }
+    }
     
     init() {
         super.init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -47,7 +48,19 @@ extension ColorsCollectionView: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorsCollectionCell.reuseIdentifier, for: indexPath) as? ColorsCollectionCell
         guard let cell else { return UICollectionViewCell() }
         
-        cell.colorLabel.backgroundColor = colorsCollectionViewItems[indexPath.item]
+        let color = colorsCollectionViewItems[indexPath.item]
+        cell.colorLabel.backgroundColor = color
+        
+        
+        if color == selectedColor {
+            cell.layer.borderWidth = 3
+            cell.layer.cornerRadius = 8
+            cell.layer.masksToBounds = true
+            cell.layer.borderColor = colorsCollectionViewItems[indexPath.item].withAlphaComponent(0.3).cgColor
+        } else {
+            cell.layer.borderWidth = 0
+        }
+        
         return cell
     }
     

@@ -13,7 +13,11 @@ final class EmojiCollectionView: UICollectionView {
     
     private let emojiCollectionViewItems = [ "🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪" ]
     
-    private(set) var selectedEmoji: String?
+    var selectedEmoji: String? {
+        didSet {
+            reloadData()
+        }
+    }
     
     init() {
         super.init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -45,7 +49,15 @@ extension EmojiCollectionView: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCollectionCell.reuseIdentifier, for: indexPath) as? EmojiCollectionCell
         guard let cell else { return UICollectionViewCell() }
         
-        cell.emojiLabel.text = emojiCollectionViewItems[indexPath.item]
+        let emoji = emojiCollectionViewItems[indexPath.item]
+        cell.emojiLabel.text = emoji
+        
+        if emoji == selectedEmoji {
+            cell.contentView.backgroundColor = .tLightGrey
+        } else {
+            cell.contentView.backgroundColor = .clear
+        }
+        
         return cell
     }
     

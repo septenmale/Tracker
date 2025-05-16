@@ -43,7 +43,7 @@
 "saturdayShort" = "Сб";
 "sundayShort" = "Вс";
 "pinAction" = "Закрепить";
-"unpin" = "Открепить";
+"unpinAction" = "Открепить";
 "editAction" = "Редактировать";
 "deleteAction" = "Удалить";
 "sureToDeleteTracker" = "Уверены что хотите удалить трекер ?";
@@ -51,3 +51,7 @@
 "editHabitTitle" = "Редактирование привычки";
 "editEventTitle" = "Редактирование события";
 "saveButtonTitle" = "Сохранить";
+"pinnedCategory" = "Закрепленные";
+"newCategoryErrorMessageTitle" = "Пожалуйста, выберите другую категорию";
+"newCategoryErrorMessageDescription" = "Данная категория используется системой";
+"okButtonTitle" = "Понятно";

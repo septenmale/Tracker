@@ -65,6 +65,21 @@ final class NewCategoryViewController: UIViewController {
     @objc
     private func submitButtonDidTap() {
         guard let text = textField.text else { return }
+        let textToBeCompared = text.trimmingCharacters(in: .whitespaces)
+        guard textToBeCompared != NSLocalizedString("pinnedCategory", comment: "") else {
+            
+            let alertController = UIAlertController(
+                title: NSLocalizedString("newCategoryErrorMessageTitle", comment: ""),
+                message: NSLocalizedString("newCategoryErrorMessageDescription", comment: ""),
+                preferredStyle: .alert
+            )
+            
+            let okAction = UIAlertAction(title: NSLocalizedString("okButtonTitle", comment: ""), style: .default)
+            alertController.addAction(okAction)
+            present(alertController, animated: true)
+            
+            return
+        }
         viewModel.saveCategory(name: text)
         dismiss(animated: true)
     }

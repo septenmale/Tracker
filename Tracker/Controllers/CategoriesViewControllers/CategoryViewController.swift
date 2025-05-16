@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+//TODO: Настроить скрытие систменой категории 
 protocol CategoryViewControllerDelegate: AnyObject {
     func didSelectCategory(_ category: String)
 }

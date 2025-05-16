@@ -51,7 +51,18 @@ final class TrackersViewModel {
             return visibleTrackers.isEmpty ? nil : TrackerCategory(title: category.title, items: visibleTrackers)
         }
         
-        return filteredCategories
+        let pinnedKey = "pinned"
+        let sortedCategories = filteredCategories.sorted { first, second in
+            if first.title == pinnedKey && second.title != pinnedKey {
+                return true
+            } else if first.title != pinnedKey && second.title == pinnedKey {
+                return false
+            } else {
+                return true
+            }
+        }
+        
+        return sortedCategories
     }
     
     func updateTracker(
@@ -153,6 +164,18 @@ final class TrackersViewModel {
     
     func removeTracker(by id: UUID) {
         trackerStore.deleteTracker(withId: id)
+    }
+    
+    func checkPinCategoryExists() {
+        categoryStore.ensurePinCategoryExists()
+    }
+    
+    func pinTracker(id: UUID) {
+        trackerStore.pinTracker(id: id)
+    }
+
+    func unpinTracker(id: UUID) {
+        trackerStore.unpinTracker(id: id)
     }
 }
 

@@ -8,6 +8,7 @@
         <attribute name="color" attributeType="Transformable" valueTransformerName="UIColorTransformer"/>
         <attribute name="emoji" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="previousCategoryTitle" optional="YES" attributeType="String"/>
         <attribute name="schedule" attributeType="Binary" valueTransformerName=""/>
         <attribute name="title" attributeType="String"/>
         <relationship name="category" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>

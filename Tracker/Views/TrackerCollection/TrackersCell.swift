@@ -13,6 +13,7 @@ final class TrackersCell: UICollectionViewCell {
     var changeStateClosure: ((UUID) -> Void)?
     
     var trackerId: UUID?
+    var isPinned: Bool = false
     
     private let trackerContainerView: UIView = {
         let view = UIView()
@@ -22,17 +23,33 @@ final class TrackersCell: UICollectionViewCell {
         return view
     }()
     
+    private lazy var topImagesStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.addArrangedSubview(emojiLabel)
+        stackView.addArrangedSubview(pinImageView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
     private let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return label
     }()
     
+    private let pinImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(resource: .pinElement)
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     private let titleLabel: UILabel = {
-        let lable = UILabel()
-        lable.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        lable.textColor = .white
-        return lable
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        label.textColor = .white
+        return label
     }()
     
     private let stackView: UIStackView = {
@@ -99,6 +116,7 @@ final class TrackersCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         trackerContainerView.backgroundColor = tracker.color
         addAsCompleteButton.tintColor = tracker.color
+        pinImageView.isHidden = isPinned ? false : true
     }
     
     private func setupStackView() {
@@ -109,29 +127,26 @@ final class TrackersCell: UICollectionViewCell {
     
     private func setupContainerView() {
         contentView.addSubview(trackerContainerView)
-        trackerContainerView.addSubview(emojiLabel)
+        trackerContainerView.addSubview(topImagesStackView)
         trackerContainerView.addSubview(titleLabel)
     }
     
     private func setupConstraints() {
-        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
         trackerContainerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            
             trackerContainerView.topAnchor.constraint(equalTo: contentView.topAnchor),
             trackerContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackerContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             trackerContainerView.heightAnchor.constraint(equalToConstant: 90),
             
-            emojiLabel.topAnchor.constraint(equalTo: trackerContainerView.topAnchor, constant: 12),
-            emojiLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
-            emojiLabel.heightAnchor.constraint(equalToConstant: 24),
-            emojiLabel.widthAnchor.constraint(equalToConstant: 24),
+            topImagesStackView.topAnchor.constraint(equalTo: trackerContainerView.topAnchor, constant: 12),
+            topImagesStackView.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
+            topImagesStackView.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor, constant: -12),
             
-            titleLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 8),
+            titleLabel.topAnchor.constraint(equalTo: topImagesStackView.bottomAnchor, constant: 8),
             titleLabel.bottomAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: -12),
             titleLabel.leadingAnchor.constraint(equalTo: trackerContainerView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor, constant: -12),
@@ -147,7 +162,6 @@ final class TrackersCell: UICollectionViewCell {
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             daysAmountLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 12)
-            
         ])
     }
 }

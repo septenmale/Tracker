@@ -129,13 +129,11 @@ final class TrackerStore: NSObject {
                 return
             }
             
-            // Обновляем поля
             trackerToUpdate.title = title
             trackerToUpdate.emoji = emoji
             trackerToUpdate.color = color
             trackerToUpdate.schedule = try? JSONEncoder().encode(schedule)
             
-            // Находим или создаём категорию
             let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
             categoryFetch.predicate = NSPredicate(format: "title == %@", categoryTitle)
             
@@ -152,6 +150,80 @@ final class TrackerStore: NSObject {
             try context.save()
         } catch {
             assertionFailure("❌ updateTracker: Ошибка при обновлении — \(error.localizedDescription)")
+        }
+    }
+    
+    func pinTracker(id: UUID) {
+        let trackerFetch: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            guard let tracker = try context.fetch(trackerFetch).first else {
+                assertionFailure("❌ pinTracker: Трекер не найден")
+                return
+            }
+            
+            // Если уже в pinned, ничего не делаем
+            if tracker.category?.title == "pinned" {
+                return
+            }
+            
+            // Сохраняем предыдущую категорию
+            tracker.previousCategoryTitle = tracker.category?.title
+            
+            // Находим или создаём категорию pinned
+            let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            categoryFetch.predicate = NSPredicate(format: "title == %@", "pinned")
+            let pinCategory: TrackerCategoryCoreData
+            if let found = try context.fetch(categoryFetch).first {
+                pinCategory = found
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = "pinned"
+                pinCategory = newCategory
+            }
+            
+            // Меняем категорию трекера на pinned
+            tracker.category = pinCategory
+            
+            try context.save()
+        } catch {
+            assertionFailure("❌ pinTracker: Ошибка — \(error.localizedDescription)")
+        }
+    }
+    
+    func unpinTracker(id: UUID) {
+        let trackerFetch: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            guard let tracker = try context.fetch(trackerFetch).first else {
+                assertionFailure("❌ unpinTracker: Трекер не найден")
+                return
+            }
+            
+            guard let prevTitle = tracker.previousCategoryTitle else {
+                assertionFailure("❌ unpinTracker: Нет предыдущей категории")
+                return
+            }
+            
+            let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            categoryFetch.predicate = NSPredicate(format: "title == %@", prevTitle)
+            let prevCategory: TrackerCategoryCoreData
+            if let found = try context.fetch(categoryFetch).first {
+                prevCategory = found
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = prevTitle
+                prevCategory = newCategory
+            }
+            
+            tracker.category = prevCategory
+            tracker.previousCategoryTitle = nil
+            
+            try context.save()
+        } catch {
+            assertionFailure("❌ unpinTracker: Ошибка — \(error.localizedDescription)")
         }
     }
 }

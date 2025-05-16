@@ -23,6 +23,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         setupConstraints()
         
         updateTrackers(for: selectedDate)
+        viewModel.checkPinCategoryExists()
     }
     
     let viewModel = TrackersViewModel()
@@ -67,19 +68,26 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         return stackView
     }()
     
-    lazy private var plusButton: UIButton = {
+    private lazy var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "AddNewTrackerButton"), for: .normal)
         button.addTarget(self, action: #selector(addTracker), for: .touchUpInside)
         return button
     }()
     
-    lazy var datePicker: UIDatePicker = {
+    private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
         return datePicker
+    }()
+    
+    private let separatorLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = .tGray
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     func didUpdateTrackers() {
@@ -138,13 +146,19 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     
     private func setUpCollectionView() {
         view.addSubview(collectionView)
+        view.addSubview(separatorLine)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            separatorLine.heightAnchor.constraint(equalToConstant: 1),
+            separatorLine.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            separatorLine.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            separatorLine.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
         
         collectionView.delegate = self
@@ -181,10 +195,18 @@ extension TrackersViewController: UICollectionViewDelegate {
                 return cell.previewForContextMenu()
             },
             actionProvider: { actions in
+                let category = self.filteredTrackers[indexPath.section].title
+                let isPinned = (category == "pinned")
+                let pinActionTitle = isPinned ? NSLocalizedString("unpinAction", comment: "") : NSLocalizedString("pinAction", comment: "")
+                
                 return UIMenu(children: [
-                    UIAction(title: NSLocalizedString("pinAction", comment: "")) { _ in
-                        // Тут вероятнее всего добавляем в категорию "закрепленные"
-                        // Как добиться чтобы закрепленные были всегда с верху?
+                    UIAction(title: pinActionTitle) { _ in
+                        let tracker = self.filteredTrackers[indexPath.section].items[indexPath.row]
+                        if isPinned {
+                            self.viewModel.unpinTracker(id: tracker.id)
+                        } else {
+                            self.viewModel.pinTracker(id: tracker.id)
+                        }
                     },
                     UIAction(title: NSLocalizedString("editAction", comment: "")) { _ in
                         let tracker = self.filteredTrackers[indexPath.section].items[indexPath.row]
@@ -252,7 +274,11 @@ extension TrackersViewController: UICollectionViewDataSource {
         let isCompleted = viewModel.isTrackerCompleted(tracker, on: selectedDate)
         let daysCount = viewModel.getDaysAmount(tracker)
         
+        let category = self.filteredTrackers[indexPath.section].title
+        let isPinned = (category == "pinned")
+        
         cell.trackerId = tracker.id
+        cell.isPinned = isPinned
         cell.updateUI(isCompleted: isCompleted, daysCount: daysCount, tracker: tracker)
         
         cell.changeStateClosure = { [weak self] trackerId in
@@ -277,7 +303,6 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
         guard kind == UICollectionView.elementKindSectionHeader else {
             assertionFailure("Unexpected element kind \(kind)")
             return UICollectionReusableView()
@@ -292,9 +317,13 @@ extension TrackersViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        headerView.titleLabel.text = filteredTrackers[indexPath.section].title
-        return headerView
+        if filteredTrackers[indexPath.section].title == "pinned" {
+            headerView.titleLabel.text = NSLocalizedString("pinnedCategory", comment: "")
+        } else {
+            headerView.titleLabel.text = filteredTrackers[indexPath.section].title
+        }
         
+        return headerView
     }
 }
 

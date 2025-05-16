@@ -147,13 +147,10 @@ extension CategoryViewController: UITableViewDelegate {
             cell.accessoryType = .checkmark
         }
         
-        delegate?.didSelectCategory(tableView.cellForRow(at: indexPath)?.textLabel?.text ?? "По умолчанию")
+        delegate?.didSelectCategory(tableView.cellForRow(at: indexPath)?.textLabel?.text ?? NSLocalizedString("defaultCategory", comment: ""))
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cell.layer.cornerRadius = 16
-        cell.layer.masksToBounds = true
-        
         if indexPath.row == titles.count - 1 {
             cell.separatorInset = .init(top: 0, left: 0, bottom: 0, right: UIScreen.main.bounds.width)
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]

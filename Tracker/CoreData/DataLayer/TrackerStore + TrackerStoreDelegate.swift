@@ -163,15 +163,12 @@ final class TrackerStore: NSObject {
                 return
             }
             
-            // Если уже в pinned, ничего не делаем
             if tracker.category?.title == "pinned" {
                 return
             }
             
-            // Сохраняем предыдущую категорию
             tracker.previousCategoryTitle = tracker.category?.title
             
-            // Находим или создаём категорию pinned
             let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
             categoryFetch.predicate = NSPredicate(format: "title == %@", "pinned")
             let pinCategory: TrackerCategoryCoreData
@@ -183,7 +180,6 @@ final class TrackerStore: NSObject {
                 pinCategory = newCategory
             }
             
-            // Меняем категорию трекера на pinned
             tracker.category = pinCategory
             
             try context.save()

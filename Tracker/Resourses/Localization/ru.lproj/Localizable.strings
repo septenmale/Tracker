@@ -55,3 +55,9 @@
 "newCategoryErrorMessageTitle" = "Пожалуйста, выберите другую категорию";
 "newCategoryErrorMessageDescription" = "Данная категория используется системой";
 "okButtonTitle" = "Понятно";
+"filtersTitle" = "Фильтры";
+"allTrackers" = "Все трекеры";
+"trackersForToday" = "Трекеры на сегодня";
+"completedTrackers" = "Завершенные";
+"notCompletedTrackers" = "Не завершенные";
+"defaultCategory" = "По умолчанию";

@@ -18,7 +18,6 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         viewModel.delegate = self
         
         addNavItems()
-        setupStackView()
         setUpCollectionView()
         setupConstraints()
         
@@ -60,11 +59,14 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         return label
     }()
     
-    private let stackView: UIStackView = {
+    private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
+        stackView.addArrangedSubview(stubLabel)
+        stackView.addArrangedSubview(stubLabelText)
         stackView.axis = .vertical
         stackView.spacing = 8
         stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
     
@@ -90,8 +92,27 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         return view
     }()
     
+    private lazy var filtersButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .tBlue
+        button.setTitle(NSLocalizedString("filtersTitle", comment: ""), for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        button.titleEdgeInsets = UIEdgeInsets(top: 20, left: 14, bottom: 20, right: 14)
+        button.layer.cornerRadius = 16
+        button.addTarget(self, action: #selector(filtersButtonDidTap), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     func didUpdateTrackers() {
         updateTrackers(for: selectedDate)
+    }
+    
+    @objc
+    private func filtersButtonDidTap() {
+        let filtersViewController = FiltersViewController()
+        present(filtersViewController, animated: true)
     }
     
     @objc private func addTracker() {
@@ -118,20 +139,26 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         navigationItem.searchController = searchController
     }
     
-    private func setupStackView() {
-        stackView.addArrangedSubview(stubLabel)
-        stackView.addArrangedSubview(stubLabelText)
-    }
-    
     private func setupConstraints() {
         view.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(separatorLine)
+        view.addSubview(filtersButton)
         
         NSLayoutConstraint.activate([
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stubLabel.widthAnchor.constraint(equalToConstant: 80),
-            stubLabel.heightAnchor.constraint(equalToConstant: 80)
+            stubLabel.heightAnchor.constraint(equalToConstant: 80),
+            
+            separatorLine.heightAnchor.constraint(equalToConstant: 1),
+            separatorLine.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            separatorLine.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            separatorLine.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            filtersButton.heightAnchor.constraint(equalToConstant: 50),
+            filtersButton.widthAnchor.constraint(equalToConstant: 114),
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            view.safeAreaLayoutGuide.bottomAnchor.constraint(equalToSystemSpacingBelow: filtersButton.bottomAnchor, multiplier: 2),
         ])
     }
     
@@ -145,20 +172,16 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     
     private func setUpCollectionView() {
+        collectionView.isScrollEnabled = true
+        collectionView.contentInset.bottom = 66
         view.addSubview(collectionView)
-        view.addSubview(separatorLine)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.topAnchor.constraint(equalToSystemSpacingBelow: view.safeAreaLayoutGuide.topAnchor, multiplier: 1),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
-            separatorLine.heightAnchor.constraint(equalToConstant: 1),
-            separatorLine.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            separatorLine.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            separatorLine.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
         
         collectionView.delegate = self
@@ -169,7 +192,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     
 }
-// TODO: set up filtration logic
+// TODO: set up search logic
 extension TrackersViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         

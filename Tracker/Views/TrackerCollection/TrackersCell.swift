@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//TODO: Добавить перенос строки чтобы местилось название трекера 
+
 final class TrackersCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackersCell"
     
@@ -49,6 +49,7 @@ final class TrackersCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textColor = .white
+        label.numberOfLines = 0
         return label
     }()
     

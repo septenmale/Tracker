@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//TODO: Прятать кнопку фильтры если нету трекеров
+
 protocol FiltersViewControllerDelegate: AnyObject {
     func filtersViewController(didSelectFilter filter: TrackerFilter)
 }

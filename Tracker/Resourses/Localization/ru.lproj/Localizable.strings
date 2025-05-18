@@ -5,7 +5,9 @@
   Created by Viktor Zavhorodnii on 09/05/2025.
   
 */
-//TODO: добавить для "Новое нерегулярное событие", "Введите название трекера"
+
+"trackersLabel" = "Трекеры";
+"statisticLabel" = "Статистика";
 "firstOnbTitle" = "Отслеживайте только\nто, что хотите";
 "secondOnbTitle" = "Даже если это\nне литры воды и йога";
 "onbButton" = "Вот это технологии !";
@@ -14,6 +16,7 @@
 "trackerCreationTitle" = "Создание трекера";
 "habitButtonTitle" = "Привычка";
 "unregularEventButtonTitle" = "Нерегулярное событие";
+"newUnregularEventTitle" = "Новое нерегулярное событие";
 "newHabitTitle" = "Новая привычка";
 "newHabitTextFieldPlaceholder" = "Введите название трекера";
 "category" = "Категория";
@@ -47,7 +50,6 @@
 "editAction" = "Редактировать";
 "deleteAction" = "Удалить";
 "sureToDeleteTracker" = "Уверены что хотите удалить трекер ?";
-//TODO: Добавить для других языков
 "editHabitTitle" = "Редактирование привычки";
 "editEventTitle" = "Редактирование события";
 "saveButtonTitle" = "Сохранить";

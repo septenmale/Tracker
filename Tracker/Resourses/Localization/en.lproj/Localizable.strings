@@ -6,6 +6,8 @@
   
 */
 
+"trackersLabel" = "Trackers";
+"statisticLabel" = "Statistics";
 "firstOnbTitle" = "Track only what\nyou want";
 "secondOnbTitle" = "Even if it’s not liters\nof water and yoga";
 "onbButton" = "That's some tech!";
@@ -14,6 +16,7 @@
 "trackerCreationTitle" = "Create tracker";
 "habitButtonTitle" = "Habit";
 "unregularEventButtonTitle" = "Irregular event";
+"newUnregularEventTitle" = "New Irregular Event";
 "newHabitTitle" = "New habit";
 "newHabitTextFieldPlaceholder" = "Enter tracker name";
 "category" = "Category";
@@ -47,3 +50,16 @@
 "editAction" = "Edit";
 "deleteAction" = "Delete";
 "sureToDeleteTracker" = "Are you sure you want to delete this tracker?";
+"editHabitTitle" = "Edit habit";
+"editEventTitle" = "Edit event";
+"saveButtonTitle" = "Save";
+"pinnedCategory" = "Pinned";
+"newCategoryErrorMessageTitle" = "Please choose another category";
+"newCategoryErrorMessageDescription" = "This category is used by the system";
+"okButtonTitle" = "OK";
+"filtersTitle" = "Filters";
+"allTrackers" = "All trackers";
+"trackersForToday" = "Trackers for today";
+"completedTrackers" = "Completed";
+"notCompletedTrackers" = "Not completed";
+"defaultCategory" = "Default";

@@ -50,7 +50,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.text = "Новое нерегулярное событие"
+        label.text = NSLocalizedString("newUnregularEventTitle", comment: "")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -69,7 +69,7 @@ final class NewEventViewController: UIViewController, ChangeButtonStateDelegate 
     
     private let textField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("newHabitTextFieldPlaceholder", comment: "")
         textField.backgroundColor = .tBackground
         textField.layer.cornerRadius = 16
         textField.layer.masksToBounds = false

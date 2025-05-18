@@ -24,10 +24,10 @@ final class TabViewController: UITabBarController {
         let nav1 = UINavigationController(rootViewController: TrackersVC)
         let nav2 = UINavigationController(rootViewController: StatisticVC)
         
-        nav1.tabBarItem = UITabBarItem(title: "Trackers",
+        nav1.tabBarItem = UITabBarItem(title: NSLocalizedString("trackersLabel", comment: ""),
                                        image: UIImage(named: "TrackersTabBarItem"),
                                        tag: 1)
-        nav2.tabBarItem = UITabBarItem(title: "Statistic",
+        nav2.tabBarItem = UITabBarItem(title: NSLocalizedString("statisticLabel", comment: ""),
                                        image: UIImage(named: "StatTabBarITem"),
                                        tag: 2)
         

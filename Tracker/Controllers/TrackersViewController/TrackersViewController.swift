@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+//TODO: Прятать кнопку фильтры если нету трекеров
 final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     private var currentFilter: TrackerFilter = .allFilters
@@ -14,7 +14,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = "Trackers"
+        title = NSLocalizedString("trackersLabel", comment: "")
         viewModel.delegate = self
         
         addNavItems()
@@ -147,9 +147,9 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     
     private func setupConstraints() {
+        view.addSubview(filtersButton)
         view.addSubview(stackView)
         view.addSubview(separatorLine)
-        view.addSubview(filtersButton)
         
         NSLayoutConstraint.activate([
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -170,7 +170,8 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }
     
     private func setupUIBasedOnData() {
-        filteredTrackers.isEmpty ? updateScreen(showCollectionView: false) : updateScreen(showCollectionView: true)
+        let isEmpty = filteredTrackers.isEmpty
+        updateScreen(showCollectionView: !isEmpty)
     }
     
     private func updateScreen(showCollectionView: Bool) {

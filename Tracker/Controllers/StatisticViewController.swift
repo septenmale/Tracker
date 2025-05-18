@@ -12,7 +12,7 @@ final class StatisticViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = "Statistics"
+        title = NSLocalizedString("statisticLabel", comment: "")
     }
     
 }

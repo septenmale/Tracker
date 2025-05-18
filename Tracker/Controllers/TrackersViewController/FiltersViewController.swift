@@ -6,8 +6,26 @@
 //
 
 import UIKit
-//TODO: Стоит как то передать текузий выбранный фильтр чтобы обновть галочку. Подумать над отдельной VM
+//TODO: Прятать кнопку фильтры если нету трекеров
+protocol FiltersViewControllerDelegate: AnyObject {
+    func filtersViewController(didSelectFilter filter: TrackerFilter)
+}
+
 final class FiltersViewController: UIViewController {
+    weak var delegate: FiltersViewControllerDelegate?
+    
+    var selectedFilter: TrackerFilter = .allFilters
+    private var selectedIndex: Int {
+        filters.firstIndex(of: selectedFilter) ?? 0
+    }
+    
+    private let filters: [TrackerFilter] = [
+        .allFilters,
+        .trackersForToday,
+        .completedTrackers,
+        .uncompletedTrackers
+    ]
+    
     private let titles = [
         NSLocalizedString("allTrackers", comment: ""),
         NSLocalizedString("trackersForToday", comment: ""),
@@ -33,6 +51,7 @@ final class FiltersViewController: UIViewController {
         tableView.rowHeight = 75
         tableView.layoutMargins = .init(top: 26, left: 16, bottom: 26, right: 16)
         tableView.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+        tableView.isScrollEnabled = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
@@ -42,11 +61,6 @@ final class FiltersViewController: UIViewController {
         view.backgroundColor = .systemBackground
         
         setupUI()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        tableView.visibleCells.forEach { $0.accessoryType = .none }
     }
     
     private func setupUI() {
@@ -77,19 +91,22 @@ extension FiltersViewController: UITableViewDataSource {
         cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.backgroundColor = .tBackground
         cell.selectionStyle = .none
+        cell.accessoryType = (indexPath.row == selectedIndex) ? .checkmark : .none
         return cell
     }
 }
 
 extension FiltersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+        
+        let selectedFilter = filters[indexPath.row]
+        delegate?.filtersViewController(didSelectFilter: selectedFilter)
+        
         tableView.visibleCells.forEach { $0.accessoryType = .none }
+        cell.accessoryType = .checkmark
         
-        if let cell = tableView.cellForRow(at: indexPath) {
-            cell.accessoryType = .checkmark
-        }
-        
-        //TODO: Тут возможно добавить делегат чтобы передавать на главный экран выбранный фильтр
+        dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -100,11 +117,9 @@ extension FiltersViewController: UITableViewDelegate {
             cell.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         }
     }
-    
-    
 }
 
-@available(iOS 17.0, *)
-#Preview {
-    FiltersViewController()
-}
+//@available(iOS 17.0, *)
+//#Preview {
+//    FiltersViewController()
+//}

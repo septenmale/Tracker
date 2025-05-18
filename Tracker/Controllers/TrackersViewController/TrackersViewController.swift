@@ -8,8 +8,8 @@
 import UIKit
 
 final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
-    
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
+    private var currentFilter: TrackerFilter = .allFilters
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +21,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         setUpCollectionView()
         setupConstraints()
         
-        updateTrackers(for: selectedDate)
+        updateTrackers(for: selectedDate, filter: currentFilter)
         viewModel.checkPinCategoryExists()
     }
     
@@ -106,12 +106,14 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     }()
     
     func didUpdateTrackers() {
-        updateTrackers(for: selectedDate)
+        updateTrackers(for: selectedDate, filter: currentFilter)
     }
     
     @objc
     private func filtersButtonDidTap() {
         let filtersViewController = FiltersViewController()
+        filtersViewController.delegate = self
+        filtersViewController.selectedFilter = currentFilter
         present(filtersViewController, animated: true)
     }
     
@@ -124,11 +126,16 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         let chosenDate = sender.date
         selectedDate = Calendar.current.startOfDay(for: chosenDate)
-        updateTrackers(for: selectedDate)
+        
+        if currentFilter == .trackersForToday {
+            currentFilter = .allFilters
+        }
+        
+        updateTrackers(for: selectedDate, filter: currentFilter)
     }
     
-    private func updateTrackers(for date: Date) {
-        filteredTrackers = viewModel.getTrackers(for: date)
+    private func updateTrackers(for date: Date, filter: TrackerFilter) {
+        filteredTrackers = viewModel.getTrackers(for: date, filter: filter)
         collectionView.reloadData()
         setupUIBasedOnData()
     }
@@ -201,7 +208,7 @@ extension TrackersViewController: UISearchResultsUpdating {
 
 extension TrackersViewController: NewTrackerDelegate {
     func didCreateNewTracker() {
-        updateTrackers(for: selectedDate)
+        updateTrackers(for: selectedDate, filter: currentFilter)
         setupUIBasedOnData()
     }
 }
@@ -373,5 +380,19 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return params.cellSpacing
+    }
+}
+
+extension TrackersViewController: FiltersViewControllerDelegate {
+    func filtersViewController(didSelectFilter filter: TrackerFilter) {
+        currentFilter = filter
+        
+        if filter == .trackersForToday {
+            let today = Calendar.current.startOfDay(for: Date())
+            selectedDate = today
+            datePicker.setDate(today, animated: true)
+        }
+        
+        updateTrackers(for: selectedDate, filter: currentFilter)
     }
 }

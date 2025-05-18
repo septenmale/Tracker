@@ -22,17 +22,84 @@ final class TrackersViewModel {
         trackerStore.delegate = self
     }
     
-    func getTrackers(for date: Date) -> [TrackerCategory] {
-        recordStore.updateFetchRequest(for: date)
+    func getTrackers(for date: Date, filter: TrackerFilter?) -> [TrackerCategory] {
+        switch filter {
+        case .allFilters:
+            return filteredCategories(for: date)
+            
+        case .trackersForToday:
+            let today = Calendar.current.startOfDay(for: Date())
+            return filteredCategories(for: today)
+            
+        case .completedTrackers:
+            return isCompletedCategories(for: date, isCompleted: true)
+            
+        case .uncompletedTrackers:
+            return isCompletedCategories(for: date, isCompleted: false)
+            
+        case .none:
+            return filteredCategories(for: date)
+        }
         
+    }
+    
+    private func isCompletedCategories(for date: Date, isCompleted: Bool) -> [TrackerCategory] {
+        recordStore.updateFetchRequest(for: date)
         guard let recordsForDate = recordStore.fetchedResultsController.fetchedObjects else {
             assertionFailure("⚠️ getTrackers: Нет записей для даты \(date)")
             return []
         }
+        let completedIDsForDate = recordsForDate.compactMap { $0.trackers?.id }
+        let allCategories = categoryStore.fetchAllCategories()
+        let dayOfWeek = weekdayFromDate(date)
         
-        let completedIDsForDate = recordsForDate.compactMap { record in
-            return record.trackers?.id
+        let filteredCategories: [TrackerCategory] = allCategories.compactMap { category in
+            let filteredTrackers = category.items.filter { tracker in
+                if tracker.schedule.isEmpty {
+                    // Одноразовый трекер (без расписания)
+                    let totalCompletionCount = recordStore.getDaysAmount(for: tracker.id)
+                    let isCompletedToday = completedIDsForDate.contains(tracker.id)
+                    if isCompleted {
+                        // Показываем как завершённый только если был выполнен сегодня (разовый)
+                        return isCompletedToday
+                    } else {
+                        // Показываем как невыполненный, если НИКОГДА не был выполнен
+                        return totalCompletionCount == 0
+                    }
+                } else {
+                    // Привычка с расписанием: сравниваем статус на текущий день
+                    if isCompleted {
+                        // Показываем как завершённый, если был выполнен сегодня и должен быть сегодня
+                        return completedIDsForDate.contains(tracker.id) && tracker.schedule.contains(dayOfWeek)
+                    } else {
+                        // Показываем как невыполненный, если НЕ выполнен сегодня, но должен быть сегодня
+                        return !completedIDsForDate.contains(tracker.id) && tracker.schedule.contains(dayOfWeek)
+                    }
+                }
+            }
+            return filteredTrackers.isEmpty ? nil : TrackerCategory(title: category.title, items: filteredTrackers)
         }
+        
+        let pinnedKey = "pinned"
+        let sortedCategories = filteredCategories.sorted { first, second in
+            if first.title == pinnedKey && second.title != pinnedKey {
+                return true
+            } else if first.title != pinnedKey && second.title == pinnedKey {
+                return false
+            } else {
+                return true
+            }
+        }
+        return sortedCategories
+    }
+    
+    private func filteredCategories(for date: Date) -> [TrackerCategory] {
+        recordStore.updateFetchRequest(for: date)
+        guard let recordsForDate = recordStore.fetchedResultsController.fetchedObjects else {
+            assertionFailure("⚠️ getTrackers: Нет записей для даты \(date)")
+            return []
+        }
+        let completedIDsForDate = recordsForDate.compactMap { $0.trackers?.id }
         let allCategories = categoryStore.fetchAllCategories()
         let dayOfWeek = weekdayFromDate(date)
         
@@ -41,13 +108,11 @@ final class TrackersViewModel {
                 if tracker.schedule.isEmpty {
                     let totalCompletionCount = recordStore.getDaysAmount(for: tracker.id)
                     let isCompletedToday = completedIDsForDate.contains(tracker.id)
-                    
                     return totalCompletionCount == 0 ? true : isCompletedToday
                 } else {
                     return tracker.schedule.contains(dayOfWeek)
                 }
             }
-            
             return visibleTrackers.isEmpty ? nil : TrackerCategory(title: category.title, items: visibleTrackers)
         }
         
@@ -61,7 +126,6 @@ final class TrackersViewModel {
                 return true
             }
         }
-        
         return sortedCategories
     }
     
@@ -173,7 +237,7 @@ final class TrackersViewModel {
     func pinTracker(id: UUID) {
         trackerStore.pinTracker(id: id)
     }
-
+    
     func unpinTracker(id: UUID) {
         trackerStore.unpinTracker(id: id)
     }

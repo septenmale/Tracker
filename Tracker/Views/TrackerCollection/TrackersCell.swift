@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+//TODO: Добавить перенос строки чтобы местилось название трекера 
 final class TrackersCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackersCell"
     

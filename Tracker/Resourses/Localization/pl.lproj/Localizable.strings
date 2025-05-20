@@ -46,7 +46,7 @@
 "saturdayShort" = "So";
 "sundayShort" = "Nd";
 "pinAction" = "Przypnij";
-"unpin" = "Odepnij";
+"unpinAction" = "Odepnij";
 "editAction" = "Edytuj";
 "deleteAction" = "Usuń";
 "sureToDeleteTracker" = "Czy na pewno chcesz usunąć ten tracker?";
@@ -63,3 +63,4 @@
 "completedTrackers" = "Ukończone";
 "notCompletedTrackers" = "Nieukończone";
 "defaultCategory" = "Domyślna";
+"noStatisticsLabel" = "Jeszcze nie ma nic do analizy";

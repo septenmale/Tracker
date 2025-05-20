@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//TODO: Прятать кнопку фильтры если нету трекеров
+//TODO: Прятать кнопку фильтры если нету трекеров??
 final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     private var currentFilter: TrackerFilter = .allFilters
@@ -25,7 +25,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         viewModel.checkPinCategoryExists()
     }
     
-    let viewModel = TrackersViewModel()
+    let viewModel: TrackersViewModel
     let categoryViewModel = TrackerCategoryViewModel(model: TrackerCategoryStore.shared)
     
     // Возможно сделать computed и получать с VM через viewModel.getTrackers чтобы не хранить тут
@@ -105,6 +105,15 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         return button
     }()
     
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     func didUpdateTrackers() {
         updateTrackers(for: selectedDate, filter: currentFilter)
     }
@@ -172,6 +181,11 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
     private func setupUIBasedOnData() {
         let isEmpty = filteredTrackers.isEmpty
         updateScreen(showCollectionView: !isEmpty)
+        if isEmpty && (currentFilter == .allFilters || currentFilter == .trackersForToday) {
+            filtersButton.isHidden = true
+        } else {
+            filtersButton.isHidden = false
+        }
     }
     
     private func updateScreen(showCollectionView: Bool) {

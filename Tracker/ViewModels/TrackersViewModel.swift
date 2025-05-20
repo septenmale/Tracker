@@ -241,6 +241,11 @@ final class TrackersViewModel {
     func unpinTracker(id: UUID) {
         trackerStore.unpinTracker(id: id)
     }
+    
+    func getCompletedTrackersAmount() -> Int {
+        let allRecords = recordStore.getAllRecords()
+        return allRecords.count
+    }
 }
 
 extension TrackersViewModel: TrackerStoreDelegate {

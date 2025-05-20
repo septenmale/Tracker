@@ -9,14 +9,16 @@ import UIKit
 
 final class TabViewController: UITabBarController {
 
+    let viewModel = TrackersViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpTabs()
     }
 
     private func setUpTabs() {
-        let TrackersVC = TrackersViewController()
-        let StatisticVC = StatisticViewController()
+        let TrackersVC = TrackersViewController(viewModel: viewModel)
+        let StatisticVC = StatisticViewController(viewModel: viewModel)
         
         TrackersVC.navigationItem.largeTitleDisplayMode = .automatic
         StatisticVC.navigationItem.largeTitleDisplayMode = .automatic

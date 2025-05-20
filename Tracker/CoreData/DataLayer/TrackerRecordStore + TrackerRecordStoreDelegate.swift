@@ -106,6 +106,28 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
+    func getAllRecords() -> [TrackerRecord] {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        
+        do {
+            let recordsCoreData = try context.fetch(fetchRequest)
+            let recordsSwift: [TrackerRecord] = recordsCoreData.compactMap { coreDataRecord in
+                guard let id = coreDataRecord.id,
+                      let date = coreDataRecord.date
+                else {
+                        assertionFailure("⚠️ getAllRecords: Пропущена запись из-за отсутствия обязательных данных")
+                        return nil
+                }
+                return TrackerRecord(id: id, date: date)
+            }
+            return recordsSwift
+        } catch {
+            assertionFailure("❌ Ошибка получения количества записей: \(error.localizedDescription)")
+            return []
+        }
+    
+    }
+    
     // MARK: - NSFetchedResultsControllerDelegate
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.didUpdateRecords()

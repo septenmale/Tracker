@@ -63,3 +63,4 @@
 "completedTrackers" = "Завершенные";
 "notCompletedTrackers" = "Не завершенные";
 "defaultCategory" = "По умолчанию";
+"noStatisticsLabel" = "Анализировать пока нечего";

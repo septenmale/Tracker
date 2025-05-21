@@ -6,7 +6,7 @@
 //
 
 import UIKit
-//TODO: Прятать кнопку фильтры если нету трекеров??
+
 final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     private var currentFilter: TrackerFilter = .allFilters
@@ -42,6 +42,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         let searchController = UISearchController()
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.tintColor = .label
         searchController.searchBar.placeholder = NSLocalizedString("searchControllerText", comment: "")
         return searchController
     }()
@@ -69,10 +70,11 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-    
+    //TODO: Попробовать изменить randering mode на alwaysTemplate у картинки. И добавить новую в assets/добавить динамический цвет в assets
     private lazy var plusButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "AddNewTrackerButton"), for: .normal)
+        button.setImage(UIImage(named: "AddNewTrackerButton")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = .label
         button.addTarget(self, action: #selector(addTracker), for: .touchUpInside)
         return button
     }()

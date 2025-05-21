@@ -6,10 +6,33 @@
 //
 
 import UIKit
+import YandexMobileMetrica
 
 final class TrackersViewController: UIViewController, TrackersViewModelDelegate {
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
     private var currentFilter: TrackerFilter = .allFilters
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let params: [AnyHashable: Any] = [
+            "event": "open",
+            "screen": "Main"
+        ]
+        YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+            print("REPORT ERROR: \(error.localizedDescription)")
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        let params: [AnyHashable: Any] = [
+            "event": "close",
+            "screen": "Main"
+        ]
+        YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+            print("REPORT ERROR: \(error.localizedDescription)")
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,7 +93,7 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-    //TODO: Попробовать изменить randering mode на alwaysTemplate у картинки. И добавить новую в assets/добавить динамический цвет в assets
+    
     private lazy var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "AddNewTrackerButton")?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -126,12 +149,32 @@ final class TrackersViewController: UIViewController, TrackersViewModelDelegate 
         filtersViewController.delegate = self
         filtersViewController.selectedFilter = currentFilter
         present(filtersViewController, animated: true)
+        
+        let params: [AnyHashable: Any] = [
+            "event": "click",
+            "screen": "Main",
+            "item": "filter"
+        ]
+        
+        YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+            print("REPORT ERROR: \(error.localizedDescription)")
+        }
     }
     
     @objc private func addTracker() {
         let trackerTypeViewController = TrackerTypeViewController(viewModel: self.viewModel)
         trackerTypeViewController.newTrackerDelegate = self
         present(trackerTypeViewController, animated: true)
+        
+        let params: [AnyHashable: Any] = [
+            "event": "click",
+            "screen": "Main",
+            "item": "add_track"
+        ]
+        
+        YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+            print("REPORT ERROR: \(error.localizedDescription)")
+        }
     }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
@@ -273,6 +316,17 @@ extension TrackersViewController: UICollectionViewDelegate {
                         )
                         
                         self.present(editVC, animated: true)
+                        
+                        let params: [AnyHashable: Any] = [
+                            "event": "click",
+                            "screen": "Main",
+                            "item": "edit"
+                        ]
+                        
+                        YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+                            print("REPORT ERROR: \(error.localizedDescription)")
+                        }
+                        
                     },
                     // Возможно вынести алерту и дейтсвия в отдельный метод ?
                     UIAction(title: NSLocalizedString("deleteAction", comment: ""), attributes: .destructive) { _ in
@@ -294,6 +348,17 @@ extension TrackersViewController: UICollectionViewDelegate {
                         alert.addAction(cancelAction)
                         
                         self.present(alert, animated: true)
+                        
+                        let params: [AnyHashable: Any] = [
+                            "event": "click",
+                            "screen": "Main",
+                            "item": "delete"
+                        ]
+                        
+                        YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+                            print("REPORT ERROR: \(error.localizedDescription)")
+                        }
+                        
                     },
                 ])
             })
@@ -334,6 +399,15 @@ extension TrackersViewController: UICollectionViewDataSource {
             
             let selectedDate = Calendar.current.startOfDay(for: datePicker.date)
             guard selectedDate <= currentDate else { return }
+            
+            let params: [AnyHashable: Any] = [
+                "event": "click",
+                "screen": "Main",
+                "item": "track"
+            ]
+            YMMYandexMetrica.reportEvent("EVENT", parameters: params) { error in
+                print("REPORT ERROR: \(error.localizedDescription)")
+            }
             
             if self.viewModel.isTrackerCompleted(tracker, on: selectedDate) {
                 self.viewModel.markTrackerAsInProgress(tracker, on: selectedDate)

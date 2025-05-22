@@ -100,6 +100,26 @@ final class TrackerCategoryStore: NSObject {
         
         return categoriesSwift
     }
+    
+    func ensurePinCategoryExists() {
+        let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        let pinnedKey = "pinned"
+        categoryFetch.predicate = NSPredicate(format: "title == %@", pinnedKey)
+        
+        do {
+            let result = try context.fetch(categoryFetch)
+            if result.isEmpty {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = pinnedKey
+                
+                try context.save()
+            } else {
+                return
+            }
+        } catch {
+            assertionFailure("Failed checking pinned category existence: \(error.localizedDescription)")
+        }
+    }
 }
 
 //MARK: - FetchResultsController Delegate

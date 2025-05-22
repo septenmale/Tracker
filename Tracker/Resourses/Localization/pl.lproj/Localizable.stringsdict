@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>numberOfTrackers</key>
+        <dict>
+            <key>NSStringLocalizedFormatKey</key>
+            <string>%#@trackers@</string>
+            <key>trackers</key>
+            <dict>
+                <key>NSStringFormatSpecTypeKey</key>
+                <string>NSStringPluralRuleType</string>
+                <key>NSStringFormatValueTypeKey</key>
+                <string>d</string>
+                <key>one</key>
+                <string>Tracker zakończono </string>
+                <key>few</key>
+                <string>Trackery zakończono </string>
+                <key>many</key>
+                <string>Trackery zakończono </string>
+                <key>other</key>
+                <string>Trackery zakończono </string>
+            </dict>
+        </dict>
+        <key>numberOfDays</key>
+        <dict>
+            <key>NSStringLocalizedFormatKey</key>
+            <string>%#@days@</string>
+            <key>days</key>
+            <dict>
+                <key>NSStringFormatSpecTypeKey</key>
+                <string>NSStringPluralRuleType</string>
+                <key>NSStringFormatValueTypeKey</key>
+                <string>d</string>
+                <key>zero</key>
+                <string>0 dni</string>
+                <key>one</key>
+                <string>1 dzień</string>
+                <key>other</key>
+                <string>%d dni</string>
+            </dict>
+        </dict>
+    </dict>
+</plist>

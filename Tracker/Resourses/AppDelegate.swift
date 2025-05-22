@@ -6,13 +6,20 @@
 //
 
 import UIKit
+import YandexMobileMetrica
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         UIColorTransformer.register()
+        
+        guard let configuration = YMMYandexMetricaConfiguration(apiKey: "0d4b2a98-df78-4827-9ec1-07d1540dcab4") else {
+            return true
+        }
+        
+        YMMYandexMetrica.activate(with: configuration)
+        
         return true
     }
     

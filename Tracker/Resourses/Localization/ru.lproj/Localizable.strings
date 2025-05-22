@@ -1,0 +1,66 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Viktor Zavhorodnii on 09/05/2025.
+  
+*/
+
+"trackersLabel" = "Трекеры";
+"statisticLabel" = "Статистика";
+"firstOnbTitle" = "Отслеживайте только\nто, что хотите";
+"secondOnbTitle" = "Даже если это\nне литры воды и йога";
+"onbButton" = "Вот это технологии !";
+"searchControllerText" = "Поиск";
+"mainScreenPlaceHolder" = "Что будем отслеживать?";
+"trackerCreationTitle" = "Создание трекера";
+"habitButtonTitle" = "Привычка";
+"unregularEventButtonTitle" = "Нерегулярное событие";
+"newUnregularEventTitle" = "Новое нерегулярное событие";
+"newHabitTitle" = "Новая привычка";
+"newHabitTextFieldPlaceholder" = "Введите название трекера";
+"category" = "Категория";
+"schedule" = "Расписание";
+"colorTitle" = "Цвет";
+"cancelButtonTitle" = "Отменить";
+"createButtonTitle" = "Создать";
+"newCategoryPlacegolder" = "Привычки и события можно\nобъединить по смыслу";
+"addCategoryButtonTitle" = "Добавить категорию";
+"newCategoryTitle" = "Новая категория";
+"newCategoryTextFieldPlaceholder" = "Введите название категории";
+"confirmButtonTitle" = "Готово";
+"textLengthWarningLabel" = "Ограничение 38 символов";
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда";
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
+"everyDaySubtitle" = "каждый день";
+"mondayShort" = "Пн";
+"tuesdayShort" = "Вт";
+"wednesdayShort" = "Ср";
+"thursdayShort" = "Чт";
+"fridayShort" = "Пт";
+"saturdayShort" = "Сб";
+"sundayShort" = "Вс";
+"pinAction" = "Закрепить";
+"unpinAction" = "Открепить";
+"editAction" = "Редактировать";
+"deleteAction" = "Удалить";
+"sureToDeleteTracker" = "Уверены что хотите удалить трекер ?";
+"editHabitTitle" = "Редактирование привычки";
+"editEventTitle" = "Редактирование события";
+"saveButtonTitle" = "Сохранить";
+"pinnedCategory" = "Закрепленные";
+"newCategoryErrorMessageTitle" = "Пожалуйста, выберите другую категорию";
+"newCategoryErrorMessageDescription" = "Данная категория используется системой";
+"okButtonTitle" = "Понятно";
+"filtersTitle" = "Фильтры";
+"allTrackers" = "Все трекеры";
+"trackersForToday" = "Трекеры на сегодня";
+"completedTrackers" = "Завершенные";
+"notCompletedTrackers" = "Не завершенные";
+"defaultCategory" = "По умолчанию";
+"noStatisticsLabel" = "Анализировать пока нечего";

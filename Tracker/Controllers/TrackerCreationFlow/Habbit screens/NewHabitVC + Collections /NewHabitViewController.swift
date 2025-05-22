@@ -43,8 +43,8 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     private var items = [
-        ("Категория", ""),
-        ("Расписание", "")
+        (NSLocalizedString("category", comment: ""), ""),
+        (NSLocalizedString("schedule", comment: ""), "")
     ]
     
     private var selectedDays: [Int] = []
@@ -52,7 +52,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
-        label.text = "Новая привычка"
+        label.text = NSLocalizedString("newHabitTitle", comment: "")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -71,7 +71,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     
     private let textField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("newHabitTextFieldPlaceholder", comment: "")
         textField.backgroundColor = .tBackground
         textField.layer.cornerRadius = 16
         textField.layer.masksToBounds = false
@@ -86,7 +86,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     
     private lazy var warningLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("textLengthWarningLabel", comment: "")
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.textColor = .tRed
         label.isHidden = true
@@ -97,7 +97,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(NSLocalizedString("createButtonTitle", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .tGray
         button.layer.cornerRadius = 16
@@ -110,7 +110,7 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(NSLocalizedString("cancelButtonTitle", comment: ""), for: .normal)
         button.setTitleColor(.tRed, for: .normal)
         button.backgroundColor = .white
         button.layer.borderWidth = 1
@@ -132,10 +132,10 @@ final class NewHabitViewController: UIViewController, ChangeButtonStateDelegate 
     }()
     
     private func updateScheduleSubtitle(_ selectedDays: [Int]) {
-        let weekdaysShort = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        let weekdaysShort = [NSLocalizedString("mondayShort", comment: ""), NSLocalizedString("tuesdayShort", comment: ""), NSLocalizedString("wednesdayShort", comment: ""), NSLocalizedString("thursdayShort", comment: ""), NSLocalizedString("fridayShort", comment: ""), NSLocalizedString("saturdayShort", comment: ""), NSLocalizedString("sundayShort", comment: "")]
         
         if selectedDays.count == weekdaysShort.count {
-            items[1].1 = "каждый день"
+            items[1].1 = NSLocalizedString("everyDaySubtitle", comment: "")
         } else {
             var sortedDays = [String]()
             for day in selectedDays.sorted() {

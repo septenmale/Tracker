@@ -1,0 +1,66 @@
+/*
+ Localizable.strings
+ Tracker
+ 
+ Created by Viktor Zavhorodnii on 09/05/2025.
+ 
+ */
+
+"trackersLabel" = "Trackery";
+"statisticLabel" = "Statystyki";
+"firstOnbTitle" = "Śledź tylko to\nco chcesz";
+"secondOnbTitle" = "Nawet jeśli to nie\nlitry wody i joga";
+"onbButton" = "To jest technologia!";
+"searchControllerText" = "Szukaj";
+"mainScreenPlaceHolder" = "Co będziemy śledzić?";
+"trackerCreationTitle" = "Tworzenie trackera";
+"habitButtonTitle" = "Nawyk";
+"unregularEventButtonTitle" = "Nieregularne zdarzenie";
+"newUnregularEventTitle" = "Nowe nieregularne wydarzenie";
+"newHabitTitle" = "Nowy nawyk";
+"newHabitTextFieldPlaceholder" = "Wprowadź nazwę trackera";
+"category" = "Kategoria";
+"schedule" = "Harmonogram";
+"colorTitle" = "Kolor";
+"cancelButtonTitle" = "Anuluj";
+"createButtonTitle" = "Utwórz";
+"newCategoryPlacegolder" = "Nawyki i zdarzenia można\npołączyć według znaczenia";
+"addCategoryButtonTitle" = "Dodaj kategorię";
+"newCategoryTitle" = "Nowa kategoria";
+"newCategoryTextFieldPlaceholder" = "Wprowadź nazwę kategorii";
+"confirmButtonTitle" = "Gotowe";
+"textLengthWarningLabel" = "Limit 38 znaków";
+"monday" = "Poniedziałek";
+"tuesday" = "Wtorek";
+"wednesday" = "Środa";
+"thursday" = "Czwartek";
+"friday" = "Piątek";
+"saturday" = "Sobota";
+"sunday" = "Niedziela";
+"everyDaySubtitle" = "każdego dnia";
+"mondayShort" = "Pn";
+"tuesdayShort" = "Wt";
+"wednesdayShort" = "Śr";
+"thursdayShort" = "Cz";
+"fridayShort" = "Pt";
+"saturdayShort" = "So";
+"sundayShort" = "Nd";
+"pinAction" = "Przypnij";
+"unpinAction" = "Odepnij";
+"editAction" = "Edytuj";
+"deleteAction" = "Usuń";
+"sureToDeleteTracker" = "Czy na pewno chcesz usunąć ten tracker?";
+"editHabitTitle" = "Edycja nawyku";
+"editEventTitle" = "Edycja wydarzenia";
+"saveButtonTitle" = "Zapisz";
+"pinnedCategory" = "Przypięte";
+"newCategoryErrorMessageTitle" = "Wybierz inną kategorię";
+"newCategoryErrorMessageDescription" = "Ta kategoria jest używana przez system";
+"okButtonTitle" = "OK";
+"filtersTitle" = "Filtry";
+"allTrackers" = "Wszystkie trackery";
+"trackersForToday" = "Trackery na dziś";
+"completedTrackers" = "Ukończone";
+"notCompletedTrackers" = "Nieukończone";
+"defaultCategory" = "Domyślna";
+"noStatisticsLabel" = "Jeszcze nie ma nic do analizy";

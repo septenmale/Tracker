@@ -12,7 +12,7 @@ final class NewCategoryViewController: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Новая категория"
+        label.text = NSLocalizedString("newCategoryTitle", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -21,7 +21,7 @@ final class NewCategoryViewController: UIViewController {
     
     private let textField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = NSLocalizedString("newCategoryTextFieldPlaceholder", comment: "")
         textField.backgroundColor = .tBackground
         textField.layer.cornerRadius = 16
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -34,13 +34,14 @@ final class NewCategoryViewController: UIViewController {
     
     private lazy var submitButton: UIButton = {
         let button = UIButton()
-        button.setTitle( "Готово", for: .normal)
+        button.setTitle(NSLocalizedString("confirmButtonTitle", comment: ""), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.backgroundColor = .tGray
         button.layer.cornerRadius = 16
         button.titleEdgeInsets = .init(top: 19, left: 8, bottom: 19, right: 8)
         button.addTarget(self, action: #selector(submitButtonDidTap), for: .touchUpInside)
+        button.isEnabled = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -64,6 +65,21 @@ final class NewCategoryViewController: UIViewController {
     @objc
     private func submitButtonDidTap() {
         guard let text = textField.text else { return }
+        let textToBeCompared = text.trimmingCharacters(in: .whitespaces)
+        guard textToBeCompared != NSLocalizedString("pinnedCategory", comment: "") else {
+            
+            let alertController = UIAlertController(
+                title: NSLocalizedString("newCategoryErrorMessageTitle", comment: ""),
+                message: NSLocalizedString("newCategoryErrorMessageDescription", comment: ""),
+                preferredStyle: .alert
+            )
+            
+            let okAction = UIAlertAction(title: NSLocalizedString("okButtonTitle", comment: ""), style: .default)
+            alertController.addAction(okAction)
+            present(alertController, animated: true)
+            
+            return
+        }
         viewModel.saveCategory(name: text)
         dismiss(animated: true)
     }

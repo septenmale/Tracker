@@ -50,7 +50,7 @@ final class OnboardingViewController: UIPageViewController {
     
     private lazy var continueButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(NSLocalizedString("onbButton", comment: ""), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.titleEdgeInsets = .init(top: 19, left: 8, bottom: 19, right: 8)

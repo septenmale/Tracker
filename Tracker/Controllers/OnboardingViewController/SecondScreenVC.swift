@@ -26,7 +26,7 @@ final class SecondScreenVC: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32, weight: .bold)
         label.textColor = .black
-        label.text = "Даже если это\nне литры воды и йога"
+        label.text = NSLocalizedString("secondOnbTitle", comment: "")
         label.numberOfLines = 2
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

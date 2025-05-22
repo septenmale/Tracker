@@ -26,7 +26,7 @@ final class FirstScreenVC: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32, weight: .bold)
         label.textColor = .black
-        label.text = "Отслеживайте только\n то, что хотите"
+        label.text = NSLocalizedString("firstOnbTitle", comment: "")
         label.numberOfLines = 2
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

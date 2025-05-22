@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import UIKit
 
 protocol TrackerStoreDelegate: AnyObject {
     func didUpdateTrackers()
@@ -95,6 +96,130 @@ final class TrackerStore: NSObject {
             
         } catch {
             assertionFailure("❌ addTracker: Ошибка при добавлении трекера: \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteTracker(withId id: UUID) {
+        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        fetchRequest.predicate = NSPredicate(format: "id = %@", id as CVarArg)
+        
+        do {
+            guard let trackerToDelete = try context.fetch(fetchRequest).first else { return }
+            context.delete(trackerToDelete)
+            try context.save()
+        } catch {
+            assertionFailure("❌ deleteTracker: Ошибка при удалении трекера: \(error.localizedDescription)")
+        }
+    }
+    
+    func updateTracker(
+        id: UUID,
+        title: String,
+        emoji: String,
+        color: UIColor,
+        schedule: [Weekday],
+        categoryTitle: String
+    ) {
+        let trackerFetch: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            guard let trackerToUpdate = try context.fetch(trackerFetch).first else {
+                assertionFailure("❌ updateTracker: Трекер с таким id не найден")
+                return
+            }
+            
+            trackerToUpdate.title = title
+            trackerToUpdate.emoji = emoji
+            trackerToUpdate.color = color
+            trackerToUpdate.schedule = try? JSONEncoder().encode(schedule)
+            
+            let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            categoryFetch.predicate = NSPredicate(format: "title == %@", categoryTitle)
+            
+            let category: TrackerCategoryCoreData
+            if let foundCategory = try context.fetch(categoryFetch).first {
+                category = foundCategory
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = categoryTitle
+                category = newCategory
+            }
+            trackerToUpdate.category = category
+            
+            try context.save()
+        } catch {
+            assertionFailure("❌ updateTracker: Ошибка при обновлении — \(error.localizedDescription)")
+        }
+    }
+    
+    func pinTracker(id: UUID) {
+        let trackerFetch: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            guard let tracker = try context.fetch(trackerFetch).first else {
+                assertionFailure("❌ pinTracker: Трекер не найден")
+                return
+            }
+            
+            if tracker.category?.title == "pinned" {
+                return
+            }
+            
+            tracker.previousCategoryTitle = tracker.category?.title
+            
+            let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            categoryFetch.predicate = NSPredicate(format: "title == %@", "pinned")
+            let pinCategory: TrackerCategoryCoreData
+            if let found = try context.fetch(categoryFetch).first {
+                pinCategory = found
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = "pinned"
+                pinCategory = newCategory
+            }
+            
+            tracker.category = pinCategory
+            
+            try context.save()
+        } catch {
+            assertionFailure("❌ pinTracker: Ошибка — \(error.localizedDescription)")
+        }
+    }
+    
+    func unpinTracker(id: UUID) {
+        let trackerFetch: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            guard let tracker = try context.fetch(trackerFetch).first else {
+                assertionFailure("❌ unpinTracker: Трекер не найден")
+                return
+            }
+            
+            guard let prevTitle = tracker.previousCategoryTitle else {
+                assertionFailure("❌ unpinTracker: Нет предыдущей категории")
+                return
+            }
+            
+            let categoryFetch: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            categoryFetch.predicate = NSPredicate(format: "title == %@", prevTitle)
+            let prevCategory: TrackerCategoryCoreData
+            if let found = try context.fetch(categoryFetch).first {
+                prevCategory = found
+            } else {
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.title = prevTitle
+                prevCategory = newCategory
+            }
+            
+            tracker.category = prevCategory
+            tracker.previousCategoryTitle = nil
+            
+            try context.save()
+        } catch {
+            assertionFailure("❌ unpinTracker: Ошибка — \(error.localizedDescription)")
         }
     }
 }

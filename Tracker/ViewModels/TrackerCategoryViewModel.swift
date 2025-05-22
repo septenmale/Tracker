@@ -29,7 +29,8 @@ final class TrackerCategoryViewModel {
     
     func getAllTitles() -> [String] {
         let models = model.fetchAllCategories()
-        return models.map { $0.title }
+        let filteredModels = models.filter { $0.title != "pinned" }
+        return filteredModels.map { $0.title }
     }
 }
 

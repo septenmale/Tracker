@@ -21,6 +21,7 @@ extension TrackerCoreData {
     @NSManaged public var title: String?
     @NSManaged public var category: TrackerCategoryCoreData?
     @NSManaged public var record: NSSet?
+    @NSManaged public var previousCategoryTitle: String?
     
     public var decodedSchedule: [Weekday] {
         get {

@@ -20,14 +20,14 @@ final class ScheduleViewController: UIViewController {
     var onDaysSelected: (([Int]) -> Void)?
     
     private let weekdays = [
-        "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"
+        NSLocalizedString("monday", comment: ""), NSLocalizedString("tuesday", comment: ""), NSLocalizedString("wednesday", comment: ""), NSLocalizedString("thursday", comment: ""), NSLocalizedString("friday", comment: ""), NSLocalizedString("saturday", comment: ""), NSLocalizedString("sunday", comment: "")
     ]
     
     var selectedWeekdays: [Int] = []
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Расписание"
+        label.text = NSLocalizedString("schedule", comment: "")
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .blackDay
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +36,7 @@ final class ScheduleViewController: UIViewController {
     
     private lazy var submitButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("confirmButtonTitle", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .blackDay
@@ -146,9 +146,4 @@ extension ScheduleViewController: UITableViewDelegate {
         }
     }
     
-}
-
-@available(iOS 17, *)
-#Preview {
-    ScheduleViewController()
 }

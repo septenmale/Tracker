@@ -1,5 +1,7 @@
 # 🧭 Tracker App
 
+https://github.com/user-attachments/assets/28a1fcfa-b452-4b74-96ff-f4447496b1ae
+
 Tracker App is a habit-tracking iOS application that helps users build positive routines and monitor their progress over time. The app enables users to create and manage customized habit cards, track completion by weekdays, and view detailed statistics — all with a clean and intuitive UI.
 
 ---

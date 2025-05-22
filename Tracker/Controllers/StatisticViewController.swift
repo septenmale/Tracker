@@ -73,13 +73,8 @@ final class StatisticViewController: UIViewController {
     
     private func manageStubView() {
         let numberOfRecords = viewModel.getCompletedTrackersAmount()
-        if numberOfRecords > 0 {
-            stubStackView.isHidden = true
-            statCard.isHidden = false
-        } else {
-            stubStackView.isHidden = false
-            statCard.isHidden = true
-        }
+        stubStackView.isHidden = numberOfRecords > 0
+        statCard.isHidden = numberOfRecords == 0
     }
     
     private func setupUI() {

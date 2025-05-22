@@ -51,12 +51,7 @@ extension EmojiCollectionView: UICollectionViewDataSource {
         
         let emoji = emojiCollectionViewItems[indexPath.item]
         cell.emojiLabel.text = emoji
-        
-        if emoji == selectedEmoji {
-            cell.contentView.backgroundColor = .tLightGrey
-        } else {
-            cell.contentView.backgroundColor = .clear
-        }
+        cell.contentView.backgroundColor = emoji == selectedEmoji ? .tLightGrey : .clear
         
         return cell
     }

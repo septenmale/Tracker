@@ -117,7 +117,7 @@ final class TrackersCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         trackerContainerView.backgroundColor = tracker.color
         addAsCompleteButton.tintColor = tracker.color
-        pinImageView.isHidden = isPinned ? false : true
+        pinImageView.isHidden = !isPinned
     }
     
     private func setupStackView() {

@@ -163,13 +163,13 @@ final class EditTrackerViewController: UIViewController, ChangeButtonStateDelega
         if isHabit {
             selectedDays = data.tracker.schedule.map {
                 switch $0 {
-                case .monday: return 0
-                case .tuesday: return 1
-                case .wednesday: return 2
-                case .thursday: return 3
-                case .friday: return 4
-                case .saturday: return 5
-                case .sunday: return 6
+                case .monday: 0
+                case .tuesday: 1
+                case .wednesday: 2
+                case .thursday: 3
+                case .friday: 4
+                case .saturday: 5
+                case .sunday: 6
                 }
             }
             
@@ -414,15 +414,4 @@ extension EditTrackerViewController: CategoryViewControllerDelegate {
         changeCreateButtonState()
         tableView.reloadData()
     }
-}
-
-@available(iOS 17.0, *)
-#Preview {
-    let vm = TrackersViewModel()
-    let store = TrackerCategoryStore.shared
-    let catVM = TrackerCategoryViewModel(model: store)
-    let vc = CategoryViewController(viewModel: catVM)
-    let tracker: Tracker = Tracker(id: UUID(), title: "TestTracker", color: TrackerColors.colors[2], emoji: "🍔", schedule: [])
-    let data: EditableTrackerData = EditableTrackerData(tracker: tracker, categoryTitle: "Новая категория", completedDays: 4)
-    EditTrackerViewController(data: data, trackersViewModel: vm, categoryViewModel: catVM)
 }
